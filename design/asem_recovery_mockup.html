@@ -1,0 +1,505 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>ASEM Recovery mockup</title>
+<style>
+  :root {
+    --page: #0b0d11;
+    --page-text: #c9d1dc;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--page);
+    color: var(--page-text);
+    font-family: "Segoe UI", Roboto, system-ui, sans-serif;
+    padding: 36px 40px 48px;
+    width: 1320px;
+  }
+  .page-head { display: flex; align-items: center; gap: 18px; margin-bottom: 8px; }
+  .page-head h1 { font-size: 30px; font-weight: 700; color: #fff; letter-spacing: .5px; }
+  .page-head p { font-size: 14px; color: #8a94a6; }
+  .note { font-size: 13px; color: #8a94a6; margin: 6px 0 26px; max-width: 1180px; line-height: 1.5; }
+  .grid { display: grid; grid-template-columns: repeat(3, 384px); gap: 34px 46px; justify-content: center; }
+  .cap { text-align: center; font-size: 14px; color: #c9d1dc; margin-top: 12px; font-weight: 600; }
+  .cap span { display: block; font-weight: 400; color: #7d8798; font-size: 12px; margin-top: 2px; }
+
+  /* ---------- phone ---------- */
+  .frame { width: 384px; padding: 12px; border-radius: 44px; background: #1c1f25; box-shadow: 0 0 0 2px #2a2e36, 0 18px 40px rgba(0,0,0,.5); }
+  .phone {
+    width: 360px; height: 812px; border-radius: 34px; overflow: hidden; position: relative;
+    background: var(--bg); color: var(--text);
+    display: flex; flex-direction: column;
+  }
+  .dark  { --bg:#0e1116; --surface:#171b22; --surface2:#1f242d; --line:#262c36; --text:#e8ecf2; --muted:#8a94a6;
+           --accent:#00c2a8; --accent-ink:#04211d; --accent-soft:rgba(0,194,168,.14); --warn:#ffb020; --warn-soft:rgba(255,176,32,.14);
+           --danger:#ff5a5f; --danger-soft:rgba(255,90,95,.14); --info:#5aa2ff; --info-soft:rgba(90,162,255,.14); }
+  .light { --bg:#f3f5f8; --surface:#ffffff; --surface2:#eaeef3; --line:#dde2e9; --text:#121722; --muted:#5f6b7d;
+           --accent:#00a892; --accent-ink:#ffffff; --accent-soft:rgba(0,168,146,.12); --warn:#b86e00; --warn-soft:rgba(255,166,0,.16);
+           --danger:#d93a40; --danger-soft:rgba(217,58,64,.10); --info:#2f74d0; --info-soft:rgba(47,116,208,.10); }
+
+  /* status bar: 99 px cutout = 33 css px, centre punch hole */
+  .status { height: 33px; display: flex; align-items: center; justify-content: space-between; padding: 0 22px; font-size: 12.5px; font-weight: 600; position: relative; }
+  .status .hole { position: absolute; left: 50%; top: 7px; width: 19px; height: 19px; margin-left: -9.5px; border-radius: 50%; background: #000; box-shadow: 0 0 0 2px rgba(0,0,0,.25); }
+  .status .r { display: flex; gap: 10px; align-items: center; color: var(--text); }
+  .status .muted { color: var(--muted); font-weight: 500; }
+  .batt { display: inline-flex; align-items: center; gap: 4px; }
+  .batt i { width: 20px; height: 10px; border: 1.6px solid currentColor; border-radius: 3px; position: relative; display: inline-block; }
+  .batt i::after { content: ""; position: absolute; left: 1.5px; top: 1.5px; bottom: 1.5px; width: 13px; background: var(--accent); border-radius: 1px; }
+
+  .body { flex: 1; padding: 8px 16px 0; display: flex; flex-direction: column; min-height: 0; }
+
+  .topbar { display: flex; align-items: center; justify-content: space-between; margin: 4px 2px 12px; }
+  .brand { display: flex; align-items: center; gap: 10px; }
+  .brand b { font-size: 19px; letter-spacing: 2.5px; font-weight: 800; }
+  .brand small { display: block; font-size: 10.5px; color: var(--muted); letter-spacing: 1.6px; font-weight: 600; margin-top: -1px; }
+  .iconbtn { width: 38px; height: 38px; border-radius: 12px; background: var(--surface); border: 1px solid var(--line); display: grid; place-items: center; color: var(--text); }
+  .iconbtn svg { width: 19px; height: 19px; }
+
+  .hero { background: var(--surface); border: 1px solid var(--line); border-radius: 20px; padding: 16px 18px 14px; margin-bottom: 14px; }
+  .clock { font-size: 54px; font-weight: 300; letter-spacing: -1px; line-height: 1; }
+  .clock em { font-style: normal; color: var(--accent); }
+  .date { color: var(--muted); font-size: 13.5px; margin: 6px 0 12px; }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; }
+  .chip { font-size: 11.5px; font-weight: 600; padding: 5px 9px; border-radius: 999px; background: var(--surface2); color: var(--text); display: inline-flex; align-items: center; gap: 5px; }
+  .chip.ok { background: var(--accent-soft); color: var(--accent); }
+  .chip.warn { background: var(--warn-soft); color: var(--warn); }
+  .chip.info { background: var(--info-soft); color: var(--info); }
+  .chip .dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+
+  .tiles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 9px; }
+  .tile { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; height: 84px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; font-size: 12.5px; font-weight: 600; }
+  .tile .ic { width: 38px; height: 38px; border-radius: 12px; display: grid; place-items: center; background: var(--accent-soft); color: var(--accent); }
+  .tile .ic svg { width: 20px; height: 20px; }
+  .tile.w .ic { background: var(--danger-soft); color: var(--danger); }
+  .tile.b .ic { background: var(--info-soft); color: var(--info); }
+  .tile.y .ic { background: var(--warn-soft); color: var(--warn); }
+  .tile .ab { font-size: 13px; font-weight: 800; letter-spacing: .5px; }
+
+  .bottom { display: flex; gap: 9px; padding: 12px 0 10px; margin-top: auto; }
+  .btn { height: 50px; border-radius: 15px; display: flex; align-items: center; justify-content: center; gap: 8px; font-weight: 700; font-size: 14.5px; border: 1px solid var(--line); background: var(--surface); color: var(--text); }
+  .btn svg { width: 18px; height: 18px; }
+  .btn.primary { background: var(--accent); color: var(--accent-ink); border-color: transparent; flex: 1; }
+  .btn.square { width: 50px; }
+  .btn.danger { background: var(--danger-soft); color: var(--danger); border-color: transparent; }
+  .btn.flex { flex: 1; }
+
+  .nav { height: 46px; display: flex; justify-content: space-around; align-items: center; border-top: 1px solid var(--line); background: var(--surface); color: var(--muted); }
+  .nav svg { width: 21px; height: 21px; }
+  .nav .on { color: var(--accent); }
+
+  /* screen title */
+  .title { display: flex; align-items: center; gap: 10px; margin: 4px 0 12px; }
+  .title h2 { font-size: 21px; font-weight: 700; }
+  .title .back { width: 34px; height: 34px; border-radius: 11px; background: var(--surface); border: 1px solid var(--line); display: grid; place-items: center; }
+  .title .back svg { width: 18px; height: 18px; }
+  .title .sp { flex: 1; }
+
+  .seg { display: flex; background: var(--surface2); border-radius: 13px; padding: 4px; margin-bottom: 10px; }
+  .seg div { flex: 1; text-align: center; padding: 8px 0; font-size: 13px; font-weight: 700; border-radius: 10px; color: var(--muted); }
+  .seg .on { background: var(--surface); color: var(--text); box-shadow: 0 1px 2px rgba(0,0,0,.18); }
+
+  .storage { display: flex; gap: 6px; margin-bottom: 10px; }
+  .storage .chip { padding: 7px 10px; }
+  .crumb { font-size: 12.5px; color: var(--muted); margin: 0 2px 8px; display: flex; gap: 6px; align-items: center; }
+  .crumb b { color: var(--text); font-weight: 600; }
+
+  .list { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; overflow: hidden; }
+  .row { display: flex; align-items: center; gap: 12px; padding: 11px 13px; border-bottom: 1px solid var(--line); }
+  .row:last-child { border-bottom: 0; }
+  .row .fi { width: 36px; height: 36px; border-radius: 11px; display: grid; place-items: center; background: var(--surface2); color: var(--muted); flex: none; }
+  .row .fi svg { width: 19px; height: 19px; }
+  .row .fi.zip { background: var(--accent-soft); color: var(--accent); }
+  .row .fi.img { background: var(--info-soft); color: var(--info); }
+  .row .t { flex: 1; min-width: 0; }
+  .row .t b { display: block; font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .row .t span { font-size: 11.5px; color: var(--muted); }
+  .row.sel { background: var(--accent-soft); }
+  .row.sel .t b { color: var(--accent); }
+  .check { width: 22px; height: 22px; border-radius: 50%; border: 2px solid var(--line); flex: none; }
+  .row.sel .check { border: 0; background: var(--accent); display: grid; place-items: center; color: var(--accent-ink); }
+  .row.sel .check svg { width: 13px; height: 13px; }
+
+  .radio { width: 20px; height: 20px; border-radius: 50%; border: 2px solid var(--muted); flex: none; }
+  .radio.on { border-color: var(--accent); box-shadow: inset 0 0 0 4px var(--surface), inset 0 0 0 10px var(--accent); }
+  .box { width: 20px; height: 20px; border-radius: 6px; border: 2px solid var(--muted); flex: none; }
+  .box.on { border: 0; background: var(--accent); display: grid; place-items: center; color: var(--accent-ink); }
+  .box.on svg { width: 13px; height: 13px; }
+
+  .card { background: var(--surface); border: 1px solid var(--line); border-radius: 18px; padding: 14px 15px; margin-bottom: 10px; }
+  .card h3 { font-size: 14px; font-weight: 700; margin-bottom: 4px; }
+  .card p { font-size: 12.5px; color: var(--muted); line-height: 1.45; }
+  .label { font-size: 11px; letter-spacing: 1.4px; font-weight: 700; color: var(--muted); margin: 6px 4px 7px; }
+
+  .swipe { margin-top: auto; margin-bottom: 12px; height: 60px; border-radius: 20px; background: var(--accent-soft); position: relative; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; color: var(--accent); }
+  .swipe .knob { position: absolute; left: 5px; top: 5px; width: 50px; height: 50px; border-radius: 16px; background: var(--accent); display: grid; place-items: center; color: var(--accent-ink); }
+  .swipe .knob svg { width: 22px; height: 22px; }
+  .swipe .arrows { letter-spacing: 3px; margin-left: 8px; opacity: .7; }
+  .swipe.red { background: var(--danger-soft); color: var(--danger); }
+  .swipe.red .knob { background: var(--danger); color: #fff; }
+
+  .bar { height: 7px; border-radius: 99px; background: var(--surface2); overflow: hidden; margin-top: 8px; }
+  .bar i { display: block; height: 100%; background: var(--accent); border-radius: 99px; }
+
+  .pc { display: flex; align-items: center; justify-content: center; gap: 14px; padding: 16px 0 10px; }
+  .pc .dev { width: 66px; height: 66px; border-radius: 20px; background: var(--surface2); display: grid; place-items: center; color: var(--text); }
+  .pc .dev svg { width: 32px; height: 32px; }
+  .pc .link { display: flex; gap: 5px; }
+  .pc .link i { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); opacity: .35; }
+  .pc .link i:nth-child(2) { opacity: .6; } .pc .link i:nth-child(3) { opacity: 1; }
+
+  .slotcards { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; margin-bottom: 10px; }
+  .slot { border-radius: 18px; padding: 14px; background: var(--surface); border: 1px solid var(--line); }
+  .slot .big { font-size: 34px; font-weight: 800; line-height: 1; }
+  .slot p { font-size: 11.5px; color: var(--muted); margin-top: 6px; line-height: 1.4; }
+  .slot.act { border: 2px solid var(--accent); background: var(--accent-soft); }
+  .slot.act .big { color: var(--accent); }
+  .tag { display: inline-block; font-size: 10px; font-weight: 800; letter-spacing: 1px; padding: 3px 7px; border-radius: 6px; background: var(--accent); color: var(--accent-ink); margin-left: 6px; vertical-align: middle; }
+
+  .rgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; }
+  .rbtn { height: 62px; border-radius: 16px; background: var(--surface); border: 1px solid var(--line); display: flex; align-items: center; gap: 10px; padding: 0 13px; font-size: 13px; font-weight: 700; }
+  .rbtn .ic { width: 34px; height: 34px; border-radius: 11px; display: grid; place-items: center; background: var(--surface2); color: var(--text); }
+  .rbtn .ic svg { width: 18px; height: 18px; }
+
+  /* splash */
+  .splash { align-items: center; justify-content: center; background: radial-gradient(120% 70% at 50% 40%, #12302c 0%, #0e1116 60%); }
+  .splash .word { font-size: 34px; font-weight: 800; letter-spacing: 9px; margin-top: 22px; color: #fff; }
+  .splash .sub { font-size: 12px; letter-spacing: 5px; color: #7fd8ca; margin-top: 6px; font-weight: 600; }
+  .splash .ver { position: absolute; bottom: 58px; font-size: 11.5px; color: #6e7889; text-align: center; line-height: 1.6; }
+  .splash .load { position: absolute; bottom: 110px; width: 120px; height: 4px; border-radius: 9px; background: #1f242d; overflow: hidden; }
+  .splash .load i { display: block; width: 45%; height: 100%; background: #00c2a8; border-radius: 9px; }
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute">
+  <defs>
+    <linearGradient id="lg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#00d4b4"/><stop offset="1" stop-color="#2f7bff"/>
+    </linearGradient>
+  </defs>
+  <symbol id="logo" viewBox="0 0 100 100">
+    <rect x="4" y="4" width="92" height="92" rx="26" fill="url(#lg)"/>
+    <path d="M29 75 L50 25 L71 75" fill="none" stroke="#fff" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M38.5 58 H61.5" stroke="#fff" stroke-width="9" stroke-linecap="round"/>
+    <circle cx="76" cy="24" r="7" fill="#ffb020"/>
+  </symbol>
+  <g id="defs-icons" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></g>
+  <symbol id="i-install" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M7 10l5 5 5-5M4 20h16"/></g></symbol>
+  <symbol id="i-wipe" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13M10 11v5M14 11v5"/></g></symbol>
+  <symbol id="i-backup" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h18v12H3zM5 8l2-4h10l2 4M12 11v6M9 14l3-3 3 3"/></g></symbol>
+  <symbol id="i-restore" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 2.6-6.4M3 4v5h5M12 8v4l3 2"/></g></symbol>
+  <symbol id="i-mount" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="13" width="18" height="7" rx="2"/><path d="M5.5 13 8 5h8l2.5 8M7 16.5h.01M11 16.5h.01"/></g></symbol>
+  <symbol id="i-files" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6.5A1.5 1.5 0 0 1 4.5 5H9l2 2.5h8.5A1.5 1.5 0 0 1 21 9v9.5a1.5 1.5 0 0 1-1.5 1.5h-15A1.5 1.5 0 0 1 3 18.5z"/></g></symbol>
+  <symbol id="i-bolt" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></g></symbol>
+  <symbol id="i-usb" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v13M9 5l3-3 3 3M7 10v2l5 3 5-3v-2M12 15v3"/><circle cx="12" cy="20" r="2"/></g></symbol>
+  <symbol id="i-transfer" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h15l-4-4M20 16H5l4 4"/></g></symbol>
+  <symbol id="i-term" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2.5"/><path d="m7 9 3 3-3 3M12.5 15H17"/></g></symbol>
+  <symbol id="i-adv" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h10M18 6h2M4 12h3M11 12h9M4 18h12M20 18h0"/><circle cx="16" cy="6" r="2"/><circle cx="9" cy="12" r="2"/><circle cx="18" cy="18" r="2"/></g></symbol>
+  <symbol id="i-power" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v8M6.3 6.8a8 8 0 1 0 11.4 0"/></g></symbol>
+  <symbol id="i-reboot" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11a8 8 0 1 0-2.3 5.7M20 4v7h-7"/></g></symbol>
+  <symbol id="i-moon" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/></g></symbol>
+  <symbol id="i-sun" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></g></symbol>
+  <symbol id="i-back" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></g></symbol>
+  <symbol id="i-home" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11 12 4l8 7v9H4z"/></g></symbol>
+  <symbol id="i-log" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 5h14M5 10h14M5 15h9M5 20h6"/></g></symbol>
+  <symbol id="i-zip" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2h9l5 5v15H6zM14 2v6h6M10 6h2M10 9h2M10 12h2M10 15h2v3h-2z"/></g></symbol>
+  <symbol id="i-img" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></g></symbol>
+  <symbol id="i-up" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14 4 9l5-5M4 9h11a5 5 0 0 1 0 10h-3"/></g></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7"/></g></symbol>
+  <symbol id="i-chev" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m9 5 7 7-7 7"/></g></symbol>
+  <symbol id="i-phone" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="2" width="12" height="20" rx="3"/><path d="M11 18.5h2"/></g></symbol>
+  <symbol id="i-pc" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="4" width="19" height="13" rx="2"/><path d="M8 21h8M12 17v4"/></g></symbol>
+  <symbol id="i-bootl" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="3"/><path d="M9 9h6v6H9z"/></g></symbol>
+  <symbol id="i-cross" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18M3 12h18"/></g></symbol>
+</svg>
+
+<div class="page-head">
+  <svg width="54" height="54"><use href="#logo"/></svg>
+  <div>
+    <h1>ASEM Recovery &mdash; UI mockup v1</h1>
+    <p>Infinix NOTE 50 Pro 4G (X6855) &middot; 1080&times;2436 &middot; centre punch hole &middot; based on TWRP</p>
+  </div>
+</div>
+<p class="note">Design limits respected so this can really be built with the TWRP theme engine: flat colours, PNG icons, fixed-size tiles and buttons,
+swipe sliders, live variables (clock, battery, CPU temp, slot). Dark and light are two colour sets switched by one setting.
+Rounded corners are drawn as images. Times and file names are sample data.</p>
+
+<div class="grid">
+
+<!-- 1. Splash -->
+<div>
+<div class="frame"><div class="phone dark splash">
+  <svg width="112" height="112"><use href="#logo"/></svg>
+  <div class="word">ASEM</div>
+  <div class="sub">RECOVERY</div>
+  <div class="load"><i></i></div>
+  <div class="ver">R1 &middot; Infinix NOTE 50 Pro 4G<br>based on TWRP 3.7 &middot; android-14.1</div>
+</div></div>
+<div class="cap">1 &middot; Boot splash<span>logo + loading bar while recovery starts</span></div>
+</div>
+
+<!-- 2. Home dark -->
+<div>
+<div class="frame"><div class="phone dark">
+  <div class="status"><span>21:42</span><span class="hole"></span><span class="r"><span class="muted">CPU 38&deg;C</span><span class="batt"><i></i>87%</span></span></div>
+  <div class="body">
+    <div class="topbar">
+      <div class="brand"><svg width="36" height="36"><use href="#logo"/></svg><div><b>ASEM</b><small>RECOVERY</small></div></div>
+      <div class="iconbtn"><svg><use href="#i-sun"/></svg></div>
+    </div>
+    <div class="hero">
+      <div class="clock">21<em>:</em>42</div>
+      <div class="date">Friday, 16 October 2026</div>
+      <div class="chips">
+        <span class="chip ok"><span class="dot"></span>Slot B</span>
+        <span class="chip">Android 16</span>
+        <span class="chip warn"><span class="dot"></span>Data encrypted</span>
+        <span class="chip info"><span class="dot"></span>USB: MTP + ADB</span>
+      </div>
+    </div>
+    <div class="tiles">
+      <div class="tile"><div class="ic"><svg><use href="#i-install"/></svg></div>Install</div>
+      <div class="tile w"><div class="ic"><svg><use href="#i-wipe"/></svg></div>Wipe</div>
+      <div class="tile b"><div class="ic"><svg><use href="#i-backup"/></svg></div>Backup</div>
+      <div class="tile b"><div class="ic"><svg><use href="#i-restore"/></svg></div>Restore</div>
+      <div class="tile"><div class="ic"><svg><use href="#i-mount"/></svg></div>Mount</div>
+      <div class="tile"><div class="ic"><svg><use href="#i-files"/></svg></div>Files</div>
+      <div class="tile y"><div class="ic"><svg><use href="#i-bolt"/></svg></div>Fastboot</div>
+      <div class="tile"><div class="ic"><svg><use href="#i-usb"/></svg></div>ADB Sideload</div>
+      <div class="tile"><div class="ic"><svg><use href="#i-transfer"/></svg></div>ASEM Transfer</div>
+      <div class="tile y"><div class="ic"><span class="ab">A/B</span></div>Slots</div>
+      <div class="tile"><div class="ic"><svg><use href="#i-term"/></svg></div>Terminal</div>
+      <div class="tile"><div class="ic"><svg><use href="#i-adv"/></svg></div>Advanced</div>
+    </div>
+    <div class="bottom">
+      <div class="btn primary"><svg><use href="#i-reboot"/></svg>Reboot system</div>
+      <div class="btn square danger"><svg><use href="#i-power"/></svg></div>
+    </div>
+  </div>
+  <div class="nav"><svg><use href="#i-back"/></svg><svg class="on"><use href="#i-home"/></svg><svg><use href="#i-log"/></svg></div>
+</div></div>
+<div class="cap">2 &middot; Home &mdash; dark<span>big clock, phone status chips, 12 touch tiles</span></div>
+</div>
+
+<!-- 3. Home light -->
+<div>
+<div class="frame"><div class="phone light">
+  <div class="status"><span>09:15</span><span class="hole"></span><span class="r"><span class="muted">CPU 34&deg;C</span><span class="batt"><i></i>92%</span></span></div>
+  <div class="body">
+    <div class="topbar">
+      <div class="brand"><svg width="36" height="36"><use href="#logo"/></svg><div><b>ASEM</b><small>RECOVERY</small></div></div>
+      <div class="iconbtn"><svg><use href="#i-moon"/></svg></div>
+    </div>
+    <div class="hero">
+      <div class="clock">09<em>:</em>15</div>
+      <div class="date">Friday, 16 October 2026</div>
+      <div class="chips">
+        <span class="chip ok"><span class="dot"></span>Slot B</span>
+        <span class="chip">Android 16</span>
+        <span class="chip ok"><span class="dot"></span>Data decrypted</span>
+        <span class="chip info"><span class="dot"></span>USB: MTP + ADB</span>
+      </div>
+    </div>
+    <div class="tiles">
+      <div class="tile"><div class="ic"><svg><use href="#i-install"/></svg></div>Install</div>
+      <div class="tile w"><div class="ic"><svg><use href="#i-wipe"/></svg></div>Wipe</div>
+      <div class="tile b"><div class="ic"><svg><use href="#i-backup"/></svg></div>Backup</div>
+      <div class="tile b"><div class="ic"><svg><use href="#i-restore"/></svg></div>Restore</div>
+      <div class="tile"><div class="ic"><svg><use href="#i-mount"/></svg></div>Mount</div>
+      <div class="tile"><div class="ic"><svg><use href="#i-files"/></svg></div>Files</div>
+      <div class="tile y"><div class="ic"><svg><use href="#i-bolt"/></svg></div>Fastboot</div>
+      <div class="tile"><div class="ic"><svg><use href="#i-usb"/></svg></div>ADB Sideload</div>
+      <div class="tile"><div class="ic"><svg><use href="#i-transfer"/></svg></div>ASEM Transfer</div>
+      <div class="tile y"><div class="ic"><span class="ab">A/B</span></div>Slots</div>
+      <div class="tile"><div class="ic"><svg><use href="#i-term"/></svg></div>Terminal</div>
+      <div class="tile"><div class="ic"><svg><use href="#i-adv"/></svg></div>Advanced</div>
+    </div>
+    <div class="bottom">
+      <div class="btn primary"><svg><use href="#i-reboot"/></svg>Reboot system</div>
+      <div class="btn square danger"><svg><use href="#i-power"/></svg></div>
+    </div>
+  </div>
+  <div class="nav"><svg><use href="#i-back"/></svg><svg class="on"><use href="#i-home"/></svg><svg><use href="#i-log"/></svg></div>
+</div></div>
+<div class="cap">3 &middot; Home &mdash; light<span>same layout, one tap on the moon/sun switches theme</span></div>
+</div>
+
+<!-- 4. Install file picker -->
+<div>
+<div class="frame"><div class="phone dark">
+  <div class="status"><span>21:44</span><span class="hole"></span><span class="r"><span class="muted">CPU 39&deg;C</span><span class="batt"><i></i>87%</span></span></div>
+  <div class="body">
+    <div class="title"><div class="back"><svg><use href="#i-back"/></svg></div><h2>Install</h2></div>
+    <div class="seg"><div class="on">ZIP</div><div>Image</div></div>
+    <div class="storage">
+      <span class="chip ok"><span class="dot"></span>Internal</span>
+      <span class="chip">ASEM Transfer</span>
+      <span class="chip">USB OTG</span>
+    </div>
+    <div class="crumb"><svg width="14" height="14"><use href="#i-files"/></svg>/sdcard &rsaquo; <b>Download</b></div>
+    <div class="list">
+      <div class="row"><div class="fi"><svg><use href="#i-up"/></svg></div><div class="t"><b>..</b><span>Up one level</span></div></div>
+      <div class="row sel"><div class="fi zip"><svg><use href="#i-zip"/></svg></div><div class="t"><b>lineage-23.2-20261016-UNOFFICIAL-X6855.zip</b><span>1.62 GB &middot; today 20:51</span></div><div class="check"><svg><use href="#i-check"/></svg></div></div>
+      <div class="row"><div class="fi zip"><svg><use href="#i-zip"/></svg></div><div class="t"><b>Magisk-v30.2.zip</b><span>11.4 MB &middot; 12 Oct</span></div><div class="check"></div></div>
+      <div class="row"><div class="fi zip"><svg><use href="#i-zip"/></svg></div><div class="t"><b>MindTheGapps-16.0.0-arm64.zip</b><span>412 MB &middot; 14 Oct</span></div><div class="check"></div></div>
+      <div class="row"><div class="fi img"><svg><use href="#i-img"/></svg></div><div class="t"><b>ASEM_Recovery_X6855_R2.img</b><span>64 MB &middot; image</span></div><div class="check"></div></div>
+      <div class="row"><div class="fi"><svg><use href="#i-files"/></svg></div><div class="t"><b>Backups</b><span>folder</span></div></div>
+    </div>
+    <div class="bottom">
+      <div class="btn flex">Add to queue</div>
+      <div class="btn primary">Install 1 file<svg><use href="#i-chev"/></svg></div>
+    </div>
+  </div>
+  <div class="nav"><svg><use href="#i-back"/></svg><svg><use href="#i-home"/></svg><svg><use href="#i-log"/></svg></div>
+</div></div>
+<div class="cap">4 &middot; Install &mdash; file picker<span>ZIP or Image, pick storage, queue several files</span></div>
+</div>
+
+<!-- 5. Flash image confirm -->
+<div>
+<div class="frame"><div class="phone dark">
+  <div class="status"><span>21:46</span><span class="hole"></span><span class="r"><span class="muted">CPU 39&deg;C</span><span class="batt"><i></i>86%</span></span></div>
+  <div class="body">
+    <div class="title"><div class="back"><svg><use href="#i-back"/></svg></div><h2>Flash image</h2></div>
+    <div class="card">
+      <h3>ASEM_Recovery_X6855_R2.img</h3>
+      <p>64 MB &middot; vendor_boot image (header v4) &middot; checked OK</p>
+    </div>
+    <div class="label">FLASH TO PARTITION</div>
+    <div class="list">
+      <div class="row"><div class="radio"></div><div class="t"><b>Boot</b><span>kernel</span></div></div>
+      <div class="row sel"><div class="radio on"></div><div class="t"><b>Vendor Boot (recovery)</b><span>slot B &middot; current backup saved first</span></div></div>
+      <div class="row"><div class="radio"></div><div class="t"><b>DTBO</b><span>device tree overlays</span></div></div>
+      <div class="row"><div class="radio"></div><div class="t"><b>Boot logo</b><span>logo partition</span></div></div>
+    </div>
+    <div class="label" style="margin-top:12px">OPTIONS</div>
+    <div class="list">
+      <div class="row"><div class="box on"><svg><use href="#i-check"/></svg></div><div class="t"><b>Back up current image first</b></div></div>
+      <div class="row"><div class="box"></div><div class="t"><b>Flash to both slots (A and B)</b></div></div>
+    </div>
+    <div class="swipe"><div class="knob"><svg><use href="#i-chev"/></svg></div>Swipe to flash<span class="arrows">&rsaquo;&rsaquo;&rsaquo;</span></div>
+  </div>
+  <div class="nav"><svg><use href="#i-back"/></svg><svg><use href="#i-home"/></svg><svg><use href="#i-log"/></svg></div>
+</div></div>
+<div class="cap">5 &middot; Flash image &mdash; confirm<span>safe choices, auto-backup, swipe to confirm</span></div>
+</div>
+
+<!-- 6. ASEM Transfer -->
+<div>
+<div class="frame"><div class="phone light">
+  <div class="status"><span>09:20</span><span class="hole"></span><span class="r"><span class="muted">CPU 35&deg;C</span><span class="batt"><i></i>91%</span></span></div>
+  <div class="body">
+    <div class="title"><div class="back"><svg><use href="#i-back"/></svg></div><h2>ASEM Transfer</h2></div>
+    <div class="card" style="text-align:center">
+      <div class="pc">
+        <div class="dev"><svg><use href="#i-pc"/></svg></div>
+        <div class="link"><i></i><i></i><i></i></div>
+        <div class="dev"><svg><use href="#i-phone"/></svg></div>
+      </div>
+      <h3>Connected to PC</h3>
+      <p>Open &ldquo;Infinix X6855 &rsaquo; ASEM Transfer&rdquo; on your PC<br>and drop the ROM there. Works even when data is wiped or encrypted.</p>
+    </div>
+    <div class="card">
+      <h3>Storage in RAM</h3>
+      <p>5.8 GB free of 6.0 GB &middot; cleared on reboot</p>
+      <div class="bar"><i style="width:4%"></i></div>
+    </div>
+    <div class="label">RECEIVED</div>
+    <div class="list">
+      <div class="row"><div class="fi zip"><svg><use href="#i-zip"/></svg></div><div class="t"><b>lineage-23.2-20261016-UNOFFICIAL-X6855.zip</b><span>copying&hellip; 1.04 of 1.62 GB</span><div class="bar"><i style="width:64%"></i></div></div></div>
+      <div class="row"><div class="fi zip"><svg><use href="#i-zip"/></svg></div><div class="t"><b>Magisk-v30.2.zip</b><span>11.4 MB &middot; done</span></div><div class="check" style="border:0;background:var(--accent);display:grid;place-items:center;color:#fff"><svg width="13" height="13"><use href="#i-check"/></svg></div></div>
+    </div>
+    <div class="bottom">
+      <div class="btn flex">Stop sharing</div>
+      <div class="btn primary">Install received<svg><use href="#i-chev"/></svg></div>
+    </div>
+  </div>
+  <div class="nav"><svg><use href="#i-back"/></svg><svg><use href="#i-home"/></svg><svg><use href="#i-log"/></svg></div>
+</div></div>
+<div class="cap">6 &middot; ASEM Transfer<span>copy ROMs from the PC into RAM storage</span></div>
+</div>
+
+<!-- 7. Slots & reboot -->
+<div>
+<div class="frame"><div class="phone light">
+  <div class="status"><span>09:24</span><span class="hole"></span><span class="r"><span class="muted">CPU 35&deg;C</span><span class="batt"><i></i>91%</span></span></div>
+  <div class="body">
+    <div class="title"><div class="back"><svg><use href="#i-back"/></svg></div><h2>Slots &amp; reboot</h2></div>
+    <div class="slotcards">
+      <div class="slot"><div class="big">A</div><p>XOS 15.1.2<br>bootable</p></div>
+      <div class="slot act"><div class="big">B <span class="tag">ACTIVE</span></div><p>XOS 16.3.0 SP15<br>bootable &middot; successful</p></div>
+    </div>
+    <div class="btn" style="margin-bottom:14px"><span class="ab" style="font-weight:800">A/B</span>&nbsp;Make slot A active</div>
+    <div class="label">REBOOT TO</div>
+    <div class="rgrid">
+      <div class="rbtn"><div class="ic"><svg><use href="#i-reboot"/></svg></div>System</div>
+      <div class="rbtn"><div class="ic"><svg><use href="#i-restore"/></svg></div>Recovery</div>
+      <div class="rbtn"><div class="ic"><svg><use href="#i-bootl"/></svg></div>Bootloader</div>
+      <div class="rbtn"><div class="ic"><svg><use href="#i-bolt"/></svg></div>Fastbootd</div>
+    </div>
+    <div class="card" style="margin-top:12px">
+      <h3>Safe by design</h3>
+      <p>No buttons for preloader, LK, TEE or seccfg. Bootloader fastboot always stays reachable to undo.</p>
+    </div>
+    <div class="swipe red"><div class="knob"><svg><use href="#i-power"/></svg></div>Swipe to power off<span class="arrows">&rsaquo;&rsaquo;&rsaquo;</span></div>
+  </div>
+  <div class="nav"><svg><use href="#i-back"/></svg><svg><use href="#i-home"/></svg><svg><use href="#i-log"/></svg></div>
+</div></div>
+<div class="cap">7 &middot; Slots &amp; reboot<span>see both slots, switch with one tap</span></div>
+</div>
+
+<!-- 8. Wipe -->
+<div>
+<div class="frame"><div class="phone dark">
+  <div class="status"><span>21:50</span><span class="hole"></span><span class="r"><span class="muted">CPU 38&deg;C</span><span class="batt"><i></i>85%</span></span></div>
+  <div class="body">
+    <div class="title"><div class="back"><svg><use href="#i-back"/></svg></div><h2>Wipe</h2></div>
+    <div class="card" style="border-color:transparent;background:var(--warn-soft)">
+      <h3 style="color:var(--warn)">Before a new ROM</h3>
+      <p>Factory reset keeps your photos in /sdcard. Format data erases everything and removes encryption.</p>
+    </div>
+    <div class="list">
+      <div class="row sel"><div class="box on"><svg><use href="#i-check"/></svg></div><div class="t"><b>Factory reset</b><span>data (except /sdcard), cache, dalvik</span></div></div>
+      <div class="row"><div class="box"></div><div class="t"><b>Dalvik / ART cache</b><span>app cache only</span></div></div>
+      <div class="row"><div class="box"></div><div class="t"><b>Metadata</b><span>encryption keys &middot; advanced</span></div></div>
+      <div class="row"><div class="box"></div><div class="t"><b>USB OTG</b><span>not connected</span></div></div>
+    </div>
+    <div class="btn danger" style="margin-top:10px">Format data&hellip; (type YES)</div>
+    <div class="swipe red"><div class="knob"><svg><use href="#i-chev"/></svg></div>Swipe to wipe<span class="arrows">&rsaquo;&rsaquo;&rsaquo;</span></div>
+  </div>
+  <div class="nav"><svg><use href="#i-back"/></svg><svg><use href="#i-home"/></svg><svg><use href="#i-log"/></svg></div>
+</div></div>
+<div class="cap">8 &middot; Wipe<span>clear wording, red swipe for anything destructive</span></div>
+</div>
+
+<!-- 9. Mount -->
+<div>
+<div class="frame"><div class="phone dark">
+  <div class="status"><span>21:52</span><span class="hole"></span><span class="r"><span class="muted">CPU 38&deg;C</span><span class="batt"><i></i>85%</span></span></div>
+  <div class="body">
+    <div class="title"><div class="back"><svg><use href="#i-back"/></svg></div><h2>Mount</h2></div>
+    <div class="label">PARTITIONS &middot; SLOT B</div>
+    <div class="list">
+      <div class="row"><div class="box on"><svg><use href="#i-check"/></svg></div><div class="t"><b>Data</b><span>f2fs &middot; encrypted &middot; 214 GB free</span></div></div>
+      <div class="row"><div class="box on"><svg><use href="#i-check"/></svg></div><div class="t"><b>Metadata</b><span>ext4</span></div></div>
+      <div class="row"><div class="box"></div><div class="t"><b>System</b><span>erofs &middot; read-only</span></div></div>
+      <div class="row"><div class="box"></div><div class="t"><b>Vendor</b><span>erofs &middot; read-only</span></div></div>
+      <div class="row"><div class="box"></div><div class="t"><b>Product / System_ext / ODM</b><span>erofs &middot; read-only</span></div></div>
+      <div class="row"><div class="box"></div><div class="t"><b>USB OTG</b><span>not connected</span></div></div>
+    </div>
+    <div class="label" style="margin-top:12px">USB MODE</div>
+    <div class="seg"><div class="on">MTP</div><div>ADB only</div><div>Off</div></div>
+    <div class="bottom">
+      <div class="btn flex">Unmount all</div>
+      <div class="btn primary">Done</div>
+    </div>
+  </div>
+  <div class="nav"><svg><use href="#i-back"/></svg><svg><use href="#i-home"/></svg><svg><use href="#i-log"/></svg></div>
+</div></div>
+<div class="cap">9 &middot; Mount<span>tick to mount, USB mode switch</span></div>
+</div>
+
+</div>
+</body>
+</html>
