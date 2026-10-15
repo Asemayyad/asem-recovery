@@ -138,7 +138,12 @@ TW_DEVICE_VERSION := ASEM_R1
 TW_THEME := portrait_hdpi
 TW_FRAMERATE := 60
 TW_DEFAULT_LANGUAGE := en
-TW_EXTRA_LANGUAGES := true
+# ASEM ships only English + Arabic (its own font); the CJK extra fonts are ~16 MB.
+TW_EXTRA_LANGUAGES := false
+
+# No software "reboot to recovery" anywhere on this phone (the Rescue Toolbox
+# avoids it too). ASEM shows the key combo instead: power off, Power + Volume Up.
+TW_NO_REBOOT_RECOVERY := true
 
 # Display 1080x2436, centre punch hole 99 px tall (from stock DisplayCutout)
 TW_Y_OFFSET := 99

@@ -25,6 +25,24 @@ byte-identical (round-trip test: rebuilding stock gives a byte-identical image).
 The stock image has an AVB hash footer; ours has none. With the unlocked
 bootloader (state "orange") this is accepted, same as the Magisk-patched boot.
 
+## The ASEM theme (theme/)
+
+Built in from the first build (no plain-TWRP stage):
+
+- `theme/apply_theme.py` - applies the theme to the synced TWRP tree; `--check`
+  validates every XML file, image, font, page link and string before compiling.
+- `theme/tools/make_images.py` - draws all theme images (dark `_d` / light `_l`)
+  from `tools/icon_sheet.png` (rendered from `tools/icons.html`) and the logo.
+- `theme/tools/arabic.py` - joins Arabic letters and orders text right-to-left
+  (TWRP cannot do this itself). Font: Tajawal (OFL), English + Arabic.
+- `theme/tools/preview.py` - draws the generated pages on a PC at 1080x2337;
+  results in `design/build_preview/`.
+- Light theme: `ui_light.xml` + a 2-line patch in gui/pages.cpp and gui/gui.cpp.
+- `TW_NO_REBOOT_RECOVERY := true`: no software reboot-to-recovery anywhere.
+
+Licence: TWRP is GPLv3. Keeping this private is fine; when ASEM Recovery builds
+are shared publicly, this source must be published with them.
+
 ## Build
 
 Linux x86_64, ~60-80 GB free, `repo`, Python 3, the usual AOSP build packages.

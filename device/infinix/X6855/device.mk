@@ -7,9 +7,6 @@ LOCAL_PATH := device/infinix/X6855
 # Virtual A/B with compression (stock: VABC, userspace snapshots) - brings snapuserd
 $(call inherit-product, $(SRC_TARGET_DIR)/product/virtual_ab_ota/vabc_features.mk)
 
-# API level (stock ro.product.first_api_level=35)
-PRODUCT_SHIPPING_API_LEVEL := 35
-
 # Dynamic partitions
 PRODUCT_USE_DYNAMIC_PARTITIONS := true
 

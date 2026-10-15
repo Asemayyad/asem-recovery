@@ -26,6 +26,11 @@ if [ ! -d .repo ]; then
 fi
 repo sync -c --no-clone-bundle --no-tags --optimized-fetch --prune --force-sync -j"$(( $(nproc) * 4 ))"
 
+echo "== applying the ASEM theme (validated before compiling)"
+git -C bootable/recovery checkout -q -- .
+git -C bootable/recovery clean -fdq
+python3 "$HERE/theme/apply_theme.py" --check "$WORK"
+
 echo "== copying device tree"
 rm -rf device/infinix/X6855
 mkdir -p device/infinix
