@@ -1,0 +1,28 @@
+# ASEM Recovery - X6855 partitions shown in the UI
+# mount point    fs    device                              flags
+# Never listed (never flashable from recovery): preloader, lk, tee, seccfg, efuse, otp, sec1, frp.
+
+# Boot chain (A/B)
+/boot            emmc  /dev/block/by-name/boot             flags=display="Boot";backup=1;flashimg=1;slotselect
+/vendor_boot     emmc  /dev/block/by-name/vendor_boot      flags=display="Vendor Boot (recovery)";backup=1;flashimg=1;slotselect
+/dtbo            emmc  /dev/block/by-name/dtbo             flags=display="DTBO";backup=1;flashimg=1;slotselect
+/vbmeta          emmc  /dev/block/by-name/vbmeta           flags=display="VBMeta";backup=1;flashimg=1;slotselect
+/vbmeta_system   emmc  /dev/block/by-name/vbmeta_system    flags=display="VBMeta System";backup=1;flashimg=1;slotselect
+/vbmeta_vendor   emmc  /dev/block/by-name/vbmeta_vendor    flags=display="VBMeta Vendor";backup=1;flashimg=1;slotselect
+/logo            emmc  /dev/block/by-name/logo             flags=display="Boot logo";backup=1;flashimg=1;slotselect
+
+# Dynamic partitions (whole super, for full backups)
+/super           emmc  /dev/block/by-name/super            flags=display="Super";backup=1;flashimg=1
+
+# IMEI / modem / calibration - backup only (restore = flash by hand, on purpose)
+/nvram           emmc  /dev/block/by-name/nvram            flags=display="NVRAM (IMEI)";backup=1
+/nvcfg           ext4  /dev/block/by-name/nvcfg            flags=display="NVCFG";backup=1
+/nvdata          ext4  /dev/block/by-name/nvdata           flags=display="NVDATA";backup=1
+/protect_f       ext4  /dev/block/by-name/protect1         flags=display="Protect 1";backup=1
+/protect_s       ext4  /dev/block/by-name/protect2         flags=display="Protect 2";backup=1
+/persist         ext4  /dev/block/by-name/persist          flags=display="Persist";backup=1
+/proinfo         emmc  /dev/block/by-name/proinfo          flags=display="Proinfo";backup=1
+/md1img          emmc  /dev/block/by-name/md1img           flags=display="Modem";backup=1;slotselect
+
+# Removable storage (no microSD slot on X6855; UFS uses sda-sdc, so OTG is sdd)
+/usb_otg         auto  /dev/block/sdd1  /dev/block/sdd     flags=display="USB OTG";storage;wipeingui;removable

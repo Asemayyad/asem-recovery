@@ -1,0 +1,4 @@
+* text=auto eol=lf
+*.img binary
+*.dtb binary
+device/infinix/X6855/prebuilt/kernel binary
