@@ -22,25 +22,50 @@ jobs:
     runs-on: ubuntu-22.04
     timeout-minutes: 350
     steps:
-      - name: Make room (one big build volume + swap)
-        uses: easimon/maximize-build-space@v10
-        with:
-          root-reserve-mb: 6144
-          swap-size-mb: 14336
-          remove-dotnet: "true"
-          remove-android: "true"
-          remove-haskell: "true"
-          remove-codeql: "true"
-          remove-docker-images: "true"
-
       - name: Check out ASEM Recovery
         uses: actions/checkout@v7
         with:
           path: asem
 
-      - name: Machine info
+      - name: Make room (pick the biggest disk, add swap)
+        # No LVM tricks: an earlier run filled the system disk to 0 bytes that way and
+        # the runner crashed without saving a log.
         run: |
-          nproc; free -h; df -h "$GITHUB_WORKSPACE" /
+          echo "== before"; df -h; free -h; nproc
+          sudo swapoff -a || true
+          sudo rm -f /mnt/swapfile /swapfile
+          for d in /usr/share/dotnet /usr/local/lib/android /opt/ghc /usr/local/.ghcup \
+                   /opt/hostedtoolcache /usr/local/share/boost /usr/share/swift \
+                   /usr/local/share/powershell /usr/local/share/chromium /usr/local/lib/node_modules \
+                   /usr/lib/jvm /usr/lib/google-cloud-sdk /opt/az /opt/microsoft /opt/google \
+                   /opt/pipx /usr/share/miniconda /usr/local/aws-cli /usr/local/aws-sam-cli \
+                   /usr/local/julia* /opt/mssql-tools; do
+            sudo rm -rf $d &
+          done
+          sudo docker image prune -af >/dev/null 2>&1 &
+          wait
+          sudo apt-get clean
+          root_free=$(df -m --output=avail / | tail -1)
+          mnt_free=0
+          if [ -d /mnt ] && [ "$(stat -c %d /mnt)" != "$(stat -c %d /)" ]; then
+            mnt_free=$(df -m --output=avail /mnt | tail -1)
+          fi
+          echo "free: root ${root_free} MB, separate /mnt ${mnt_free} MB"
+          if [ "$mnt_free" -gt "$root_free" ]; then
+            build=/mnt/build; other=/; other_free=$root_free; build_free=$mnt_free
+          else
+            build=$HOME/build; other=/mnt; other_free=$mnt_free; build_free=$root_free
+          fi
+          sudo mkdir -p "$build"; sudo chown "$(id -u):$(id -g)" "$build"
+          echo "BUILD_DIR=$build" >> "$GITHUB_ENV"
+          # 10 GB swap: on the other disk if it has room, else on the build disk
+          if [ "$other_free" -gt 12000 ]; then swap=${other%/}/asem.swap; else swap=$build.swap; build_free=$((build_free - 10240)); fi
+          sudo fallocate -l 10G "$swap" && sudo chmod 600 "$swap" && sudo mkswap "$swap" >/dev/null && sudo swapon "$swap"
+          echo "== after"; df -h; free -h; echo "build dir: $build (${build_free} MB usable)"
+          if [ "$build_free" -lt 30000 ]; then
+            echo "::error::Only ${build_free} MB free for the build (needs ~30 GB) - stopping now to save minutes."
+            exit 1
+          fi
 
       - name: Install build tools
         run: |
@@ -63,7 +88,25 @@ jobs:
           ASEM_DECRYPT: ${{ inputs.decrypt && 'true' || 'false' }}
         run: |
           cd asem
-          bash build.sh "$GITHUB_WORKSPACE/twrp" 2>&1 | tee "$GITHUB_WORKSPACE/build.log"
+          log="$GITHUB_WORKSPACE/build.log"
+          setsid bash build.sh "$BUILD_DIR/twrp" > "$log" 2>&1 &
+          bpid=$!
+          tail -n +1 -f --pid=$bpid "$log" &
+          # disk watchdog: stop the build before a disk is completely full, so the
+          # runner survives and the log gets uploaded
+          n=0
+          while kill -0 $bpid 2>/dev/null; do
+            sleep 30; n=$((n + 1))
+            b=$(df -m --output=avail "$BUILD_DIR" | tail -1); r=$(df -m --output=avail / | tail -1)
+            if [ "$b" -lt 1500 ] || [ "$r" -lt 800 ]; then
+              echo "::error::Disk almost full (build dir ${b} MB, root ${r} MB) - stopping the build so the log is saved"
+              df -h; kill -TERM -- -$bpid || true; sleep 15; kill -KILL -- -$bpid 2>/dev/null || true; break
+            fi
+            [ $((n % 10)) -eq 0 ] && echo "[watch] build dir ${b} MB free, root ${r} MB free, RAM avail $(free -m | awk '/Mem:/{print $7}') MB"
+          done
+          wait $bpid; rc=$?
+          sleep 2
+          exit $rc
 
       - name: Upload recovery image
         if: success()
@@ -92,7 +135,7 @@ jobs:
           name: build-log
           path: |
             ${{ github.workspace }}/build.log
-            ${{ github.workspace }}/twrp/out/error.log
-            ${{ github.workspace }}/twrp/out/soong.log
+            ${{ env.BUILD_DIR }}/twrp/out/error.log
+            ${{ env.BUILD_DIR }}/twrp/out/soong.log
           if-no-files-found: ignore
           retention-days: 5
