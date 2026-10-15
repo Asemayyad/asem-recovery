@@ -163,8 +163,7 @@
 
   /* splash */
   .splash { align-items: center; justify-content: center; background: radial-gradient(120% 70% at 50% 40%, #12302c 0%, #0e1116 60%); }
-  .splash .word { font-size: 34px; font-weight: 800; letter-spacing: 9px; margin-top: 22px; color: #fff; }
-  .splash .sub { font-size: 12px; letter-spacing: 5px; color: #7fd8ca; margin-top: 6px; font-weight: 600; }
+  .splash .sub { font-size: 15px; letter-spacing: 9px; color: #8fe3b0; margin-top: 26px; font-weight: 700; }
   .splash .ver { position: absolute; bottom: 58px; font-size: 11.5px; color: #6e7889; text-align: center; line-height: 1.6; }
   .splash .load { position: absolute; bottom: 110px; width: 120px; height: 4px; border-radius: 9px; background: #1f242d; overflow: hidden; }
   .splash .load i { display: block; width: 45%; height: 100%; background: #00c2a8; border-radius: 9px; }
@@ -173,18 +172,6 @@
 <body>
 
 <svg width="0" height="0" style="position:absolute">
-  <defs>
-    <linearGradient id="lg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#00d4b4"/><stop offset="1" stop-color="#2f7bff"/>
-    </linearGradient>
-  </defs>
-  <symbol id="logo" viewBox="0 0 100 100">
-    <rect x="4" y="4" width="92" height="92" rx="26" fill="url(#lg)"/>
-    <path d="M29 75 L50 25 L71 75" fill="none" stroke="#fff" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
-    <path d="M38.5 58 H61.5" stroke="#fff" stroke-width="9" stroke-linecap="round"/>
-    <circle cx="76" cy="24" r="7" fill="#ffb020"/>
-  </symbol>
-  <g id="defs-icons" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></g>
   <symbol id="i-install" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M7 10l5 5 5-5M4 20h16"/></g></symbol>
   <symbol id="i-wipe" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13M10 11v5M14 11v5"/></g></symbol>
   <symbol id="i-backup" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h18v12H3zM5 8l2-4h10l2 4M12 11v6M9 14l3-3 3 3"/></g></symbol>
@@ -215,7 +202,7 @@
 </svg>
 
 <div class="page-head">
-  <svg width="54" height="54"><use href="#logo"/></svg>
+  <img src="assets/asem_logo_192.png" width="54" height="54" alt="">
   <div>
     <h1>ASEM Recovery &mdash; UI mockup v1</h1>
     <p>Infinix NOTE 50 Pro 4G (X6855) &middot; 1080&times;2436 &middot; centre punch hole &middot; based on TWRP</p>
@@ -230,8 +217,7 @@ Rounded corners are drawn as images. Times and file names are sample data.</p>
 <!-- 1. Splash -->
 <div>
 <div class="frame"><div class="phone dark splash">
-  <svg width="112" height="112"><use href="#logo"/></svg>
-  <div class="word">ASEM</div>
+  <img src="assets/asem_logo.png" width="150" height="150" alt="">
   <div class="sub">RECOVERY</div>
   <div class="load"><i></i></div>
   <div class="ver">R1 &middot; Infinix NOTE 50 Pro 4G<br>based on TWRP 3.7 &middot; android-14.1</div>
@@ -245,7 +231,7 @@ Rounded corners are drawn as images. Times and file names are sample data.</p>
   <div class="status"><span>21:42</span><span class="hole"></span><span class="r"><span class="muted">CPU 38&deg;C</span><span class="batt"><i></i>87%</span></span></div>
   <div class="body">
     <div class="topbar">
-      <div class="brand"><svg width="36" height="36"><use href="#logo"/></svg><div><b>ASEM</b><small>RECOVERY</small></div></div>
+      <div class="brand"><img src="assets/asem_logo_96.png" width="36" height="36" alt=""><div><b>ASEM</b><small>RECOVERY</small></div></div>
       <div class="iconbtn"><svg><use href="#i-sun"/></svg></div>
     </div>
     <div class="hero">
@@ -288,7 +274,7 @@ Rounded corners are drawn as images. Times and file names are sample data.</p>
   <div class="status"><span>09:15</span><span class="hole"></span><span class="r"><span class="muted">CPU 34&deg;C</span><span class="batt"><i></i>92%</span></span></div>
   <div class="body">
     <div class="topbar">
-      <div class="brand"><svg width="36" height="36"><use href="#logo"/></svg><div><b>ASEM</b><small>RECOVERY</small></div></div>
+      <div class="brand"><img src="assets/asem_logo_96.png" width="36" height="36" alt=""><div><b>ASEM</b><small>RECOVERY</small></div></div>
       <div class="iconbtn"><svg><use href="#i-moon"/></svg></div>
     </div>
     <div class="hero">
