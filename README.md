@@ -72,6 +72,8 @@ Enter recovery by hand: power off, hold Power + Volume Up.
 | A/B slot switch (stock MTK boot HAL) | |
 | Wipe cache / dalvik / data | |
 | Backup boot / vendor_boot / nvram | |
+| Reboot to: System / Bootloader / Fastbootd / Power off | |
+| Reboot to: Recovery (test with care - the Rescue Toolbox avoids software "reboot recovery" on this phone; enter recovery by hand if it misbehaves) | |
 | USB OTG | |
 | Decryption (R3) | |
 
@@ -91,7 +93,19 @@ Enter recovery by hand: power off, hold Power + Volume Up.
 ## Roadmap
 
 - R1 - plain TWRP base, all checklist items working.
-- R2 - ASEM look: logo + splash, dark and light theme, clock, new buttons;
-  "ASEM Transfer": an MTP storage in RAM so the PC can copy a ROM even when /data
-  is encrypted or wiped.
+- R2 - ASEM look, as in `design/asem_recovery_mockup.png` (v2, 15 screens):
+  - Asem's logo (`design/assets/asem_logo*.png`) on splash and top bar.
+  - Dark and light theme; every tile/option has a hint line; every screen has a
+    one-line description and a "?" help sheet.
+  - Settings: language English / Arabic, clock 12-hour (default) / 24-hour
+    (TWRP built-in `tw_military_time`), theme, brightness, vibration, timeout.
+  - Home "Reboot to..." chooser: System (green), Recovery, Bootloader, Fastbootd,
+    Power off. BROM is shown as instructions only - MediaTek BROM cannot be
+    entered from software (power off, hold Vol Up + Vol Down, plug in USB).
+  - Arabic: TWRP's text renderer does not join Arabic letters or do right-to-left
+    by itself. Plan: ship a font with Arabic (e.g. Noto Sans Arabic) and convert
+    the Arabic language file to pre-joined letter forms in visual order with a
+    small script at build time; the layout XML gets a mirrored RTL variant.
+  - "ASEM Transfer": an MTP storage in RAM so the PC can copy a ROM even when
+    /data is encrypted or wiped.
 - R3 - decryption (stock Trustonic KeyMint/Gatekeeper/mcDriverDaemon in recovery).

@@ -4,18 +4,9 @@
 <meta charset="utf-8">
 <title>ASEM Recovery mockup</title>
 <style>
-  :root {
-    --page: #0b0d11;
-    --page-text: #c9d1dc;
-  }
+  :root { --page: #0b0d11; --page-text: #c9d1dc; }
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  body {
-    background: var(--page);
-    color: var(--page-text);
-    font-family: "Segoe UI", Roboto, system-ui, sans-serif;
-    padding: 36px 40px 48px;
-    width: 1320px;
-  }
+  body { background: var(--page); color: var(--page-text); font-family: "Segoe UI", Roboto, system-ui, sans-serif; padding: 36px 40px 40px; width: 1320px; }
   .page-head { display: flex; align-items: center; gap: 18px; margin-bottom: 8px; }
   .page-head h1 { font-size: 30px; font-weight: 700; color: #fff; letter-spacing: .5px; }
   .page-head p { font-size: 14px; color: #8a94a6; }
@@ -24,42 +15,38 @@
   .cap { text-align: center; font-size: 14px; color: #c9d1dc; margin-top: 12px; font-weight: 600; }
   .cap span { display: block; font-weight: 400; color: #7d8798; font-size: 12px; margin-top: 2px; }
 
-  /* ---------- phone ---------- */
   .frame { width: 384px; padding: 12px; border-radius: 44px; background: #1c1f25; box-shadow: 0 0 0 2px #2a2e36, 0 18px 40px rgba(0,0,0,.5); }
-  .phone {
-    width: 360px; height: 812px; border-radius: 34px; overflow: hidden; position: relative;
-    background: var(--bg); color: var(--text);
-    display: flex; flex-direction: column;
-  }
+  .phone { width: 360px; height: 812px; border-radius: 34px; overflow: hidden; position: relative; background: var(--bg); color: var(--text); display: flex; flex-direction: column; }
   .dark  { --bg:#0e1116; --surface:#171b22; --surface2:#1f242d; --line:#262c36; --text:#e8ecf2; --muted:#8a94a6;
            --accent:#00c2a8; --accent-ink:#04211d; --accent-soft:rgba(0,194,168,.14); --warn:#ffb020; --warn-soft:rgba(255,176,32,.14);
            --danger:#ff5a5f; --danger-soft:rgba(255,90,95,.14); --info:#5aa2ff; --info-soft:rgba(90,162,255,.14); }
   .light { --bg:#f3f5f8; --surface:#ffffff; --surface2:#eaeef3; --line:#dde2e9; --text:#121722; --muted:#5f6b7d;
            --accent:#00a892; --accent-ink:#ffffff; --accent-soft:rgba(0,168,146,.12); --warn:#b86e00; --warn-soft:rgba(255,166,0,.16);
            --danger:#d93a40; --danger-soft:rgba(217,58,64,.10); --info:#2f74d0; --info-soft:rgba(47,116,208,.10); }
+  .rtl { direction: rtl; font-family: "Segoe UI", Tahoma, sans-serif; }
 
-  /* status bar: 99 px cutout = 33 css px, centre punch hole */
   .status { height: 33px; display: flex; align-items: center; justify-content: space-between; padding: 0 22px; font-size: 12.5px; font-weight: 600; position: relative; }
-  .status .hole { position: absolute; left: 50%; top: 7px; width: 19px; height: 19px; margin-left: -9.5px; border-radius: 50%; background: #000; box-shadow: 0 0 0 2px rgba(0,0,0,.25); }
-  .status .r { display: flex; gap: 10px; align-items: center; color: var(--text); }
+  .status .hole { position: absolute; left: 50%; top: 7px; width: 19px; height: 19px; margin-left: -9.5px; border-radius: 50%; background: #000; }
+  .status .r { display: flex; gap: 10px; align-items: center; }
   .status .muted { color: var(--muted); font-weight: 500; }
-  .batt { display: inline-flex; align-items: center; gap: 4px; }
+  .batt { display: inline-flex; align-items: center; gap: 4px; direction: ltr; }
   .batt i { width: 20px; height: 10px; border: 1.6px solid currentColor; border-radius: 3px; position: relative; display: inline-block; }
   .batt i::after { content: ""; position: absolute; left: 1.5px; top: 1.5px; bottom: 1.5px; width: 13px; background: var(--accent); border-radius: 1px; }
 
-  .body { flex: 1; padding: 8px 16px 0; display: flex; flex-direction: column; min-height: 0; }
-
-  .topbar { display: flex; align-items: center; justify-content: space-between; margin: 4px 2px 12px; }
+  .body { flex: 1; padding: 6px 16px 0; display: flex; flex-direction: column; min-height: 0; }
+  .topbar { display: flex; align-items: center; justify-content: space-between; margin: 2px 2px 10px; }
   .brand { display: flex; align-items: center; gap: 10px; }
   .brand b { font-size: 19px; letter-spacing: 2.5px; font-weight: 800; }
   .brand small { display: block; font-size: 10.5px; color: var(--muted); letter-spacing: 1.6px; font-weight: 600; margin-top: -1px; }
+  .tools { display: flex; gap: 7px; }
   .iconbtn { width: 38px; height: 38px; border-radius: 12px; background: var(--surface); border: 1px solid var(--line); display: grid; place-items: center; color: var(--text); }
   .iconbtn svg { width: 19px; height: 19px; }
 
-  .hero { background: var(--surface); border: 1px solid var(--line); border-radius: 20px; padding: 16px 18px 14px; margin-bottom: 14px; }
-  .clock { font-size: 54px; font-weight: 300; letter-spacing: -1px; line-height: 1; }
+  .hero { background: var(--surface); border: 1px solid var(--line); border-radius: 20px; padding: 13px 16px 12px; margin-bottom: 10px; }
+  .clock { font-size: 46px; font-weight: 300; letter-spacing: -1px; line-height: 1; display: flex; align-items: baseline; gap: 8px; }
   .clock em { font-style: normal; color: var(--accent); }
-  .date { color: var(--muted); font-size: 13.5px; margin: 6px 0 12px; }
+  .clock small { font-size: 17px; font-weight: 600; color: var(--muted); letter-spacing: 0; }
+  .date { color: var(--muted); font-size: 13px; margin: 5px 0 10px; }
   .chips { display: flex; flex-wrap: wrap; gap: 6px; }
   .chip { font-size: 11.5px; font-weight: 600; padding: 5px 9px; border-radius: 999px; background: var(--surface2); color: var(--text); display: inline-flex; align-items: center; gap: 5px; }
   .chip.ok { background: var(--accent-soft); color: var(--accent); }
@@ -67,48 +54,51 @@
   .chip.info { background: var(--info-soft); color: var(--info); }
   .chip .dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
 
-  .tiles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 9px; }
-  .tile { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; height: 84px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; font-size: 12.5px; font-weight: 600; }
-  .tile .ic { width: 38px; height: 38px; border-radius: 12px; display: grid; place-items: center; background: var(--accent-soft); color: var(--accent); }
-  .tile .ic svg { width: 20px; height: 20px; }
+  .tiles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .tile { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; height: 94px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; font-size: 12.5px; font-weight: 700; text-align: center; padding: 0 4px; }
+  .tile .ic { width: 34px; height: 34px; border-radius: 11px; display: grid; place-items: center; background: var(--accent-soft); color: var(--accent); margin-bottom: 2px; }
+  .tile .ic svg { width: 19px; height: 19px; }
+  .tile i { font-style: normal; font-size: 10px; font-weight: 500; color: var(--muted); line-height: 1.2; }
   .tile.w .ic { background: var(--danger-soft); color: var(--danger); }
   .tile.b .ic { background: var(--info-soft); color: var(--info); }
   .tile.y .ic { background: var(--warn-soft); color: var(--warn); }
-  .tile .ab { font-size: 13px; font-weight: 800; letter-spacing: .5px; }
+  .ab { font-size: 12.5px; font-weight: 800; letter-spacing: .5px; direction: ltr; }
 
-  .bottom { display: flex; gap: 9px; padding: 12px 0 10px; margin-top: auto; }
+  .bottom { display: flex; gap: 9px; padding: 10px 0 10px; margin-top: auto; }
   .btn { height: 50px; border-radius: 15px; display: flex; align-items: center; justify-content: center; gap: 8px; font-weight: 700; font-size: 14.5px; border: 1px solid var(--line); background: var(--surface); color: var(--text); }
   .btn svg { width: 18px; height: 18px; }
   .btn.primary { background: var(--accent); color: var(--accent-ink); border-color: transparent; flex: 1; }
   .btn.square { width: 50px; }
   .btn.danger { background: var(--danger-soft); color: var(--danger); border-color: transparent; }
   .btn.flex { flex: 1; }
+  .rtl .flip { transform: scaleX(-1); }
 
-  .nav { height: 46px; display: flex; justify-content: space-around; align-items: center; border-top: 1px solid var(--line); background: var(--surface); color: var(--muted); }
+  .nav { height: 46px; display: flex; justify-content: space-around; align-items: center; border-top: 1px solid var(--line); background: var(--surface); color: var(--muted); flex: none; }
   .nav svg { width: 21px; height: 21px; }
   .nav .on { color: var(--accent); }
 
-  /* screen title */
-  .title { display: flex; align-items: center; gap: 10px; margin: 4px 0 12px; }
-  .title h2 { font-size: 21px; font-weight: 700; }
-  .title .back { width: 34px; height: 34px; border-radius: 11px; background: var(--surface); border: 1px solid var(--line); display: grid; place-items: center; }
+  .title { display: flex; align-items: center; gap: 10px; margin: 2px 0 6px; }
+  .title h2 { font-size: 21px; font-weight: 700; flex: 1; }
+  .title .back, .title .help { width: 34px; height: 34px; border-radius: 11px; background: var(--surface); border: 1px solid var(--line); display: grid; place-items: center; }
   .title .back svg { width: 18px; height: 18px; }
-  .title .sp { flex: 1; }
+  .title .help { color: var(--accent); font-weight: 800; font-size: 16px; }
+  .lead { font-size: 12.5px; color: var(--muted); line-height: 1.45; margin: 0 2px 10px; }
 
-  .seg { display: flex; background: var(--surface2); border-radius: 13px; padding: 4px; margin-bottom: 10px; }
-  .seg div { flex: 1; text-align: center; padding: 8px 0; font-size: 13px; font-weight: 700; border-radius: 10px; color: var(--muted); }
+  .seg { display: flex; background: var(--surface2); border-radius: 13px; padding: 4px; }
+  .seg div { flex: 1; text-align: center; padding: 7px 0; font-size: 12.5px; font-weight: 700; border-radius: 10px; color: var(--muted); }
   .seg .on { background: var(--surface); color: var(--text); box-shadow: 0 1px 2px rgba(0,0,0,.18); }
+  .seg.mb { margin-bottom: 10px; }
 
-  .storage { display: flex; gap: 6px; margin-bottom: 10px; }
+  .storage { display: flex; gap: 6px; margin-bottom: 8px; }
   .storage .chip { padding: 7px 10px; }
   .crumb { font-size: 12.5px; color: var(--muted); margin: 0 2px 8px; display: flex; gap: 6px; align-items: center; }
   .crumb b { color: var(--text); font-weight: 600; }
 
   .list { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; overflow: hidden; }
-  .row { display: flex; align-items: center; gap: 12px; padding: 11px 13px; border-bottom: 1px solid var(--line); }
+  .row { display: flex; align-items: center; gap: 12px; padding: 10px 13px; border-bottom: 1px solid var(--line); }
   .row:last-child { border-bottom: 0; }
-  .row .fi { width: 36px; height: 36px; border-radius: 11px; display: grid; place-items: center; background: var(--surface2); color: var(--muted); flex: none; }
-  .row .fi svg { width: 19px; height: 19px; }
+  .row .fi { width: 34px; height: 34px; border-radius: 11px; display: grid; place-items: center; background: var(--surface2); color: var(--muted); flex: none; }
+  .row .fi svg { width: 18px; height: 18px; }
   .row .fi.zip { background: var(--accent-soft); color: var(--accent); }
   .row .fi.img { background: var(--info-soft); color: var(--info); }
   .row .t { flex: 1; min-width: 0; }
@@ -117,22 +107,21 @@
   .row.sel { background: var(--accent-soft); }
   .row.sel .t b { color: var(--accent); }
   .check { width: 22px; height: 22px; border-radius: 50%; border: 2px solid var(--line); flex: none; }
-  .row.sel .check { border: 0; background: var(--accent); display: grid; place-items: center; color: var(--accent-ink); }
-  .row.sel .check svg { width: 13px; height: 13px; }
-
+  .row.sel .check, .check.on { border: 0; background: var(--accent); display: grid; place-items: center; color: var(--accent-ink); }
+  .check svg { width: 13px; height: 13px; }
   .radio { width: 20px; height: 20px; border-radius: 50%; border: 2px solid var(--muted); flex: none; }
   .radio.on { border-color: var(--accent); box-shadow: inset 0 0 0 4px var(--surface), inset 0 0 0 10px var(--accent); }
   .box { width: 20px; height: 20px; border-radius: 6px; border: 2px solid var(--muted); flex: none; }
   .box.on { border: 0; background: var(--accent); display: grid; place-items: center; color: var(--accent-ink); }
   .box.on svg { width: 13px; height: 13px; }
 
-  .card { background: var(--surface); border: 1px solid var(--line); border-radius: 18px; padding: 14px 15px; margin-bottom: 10px; }
+  .card { background: var(--surface); border: 1px solid var(--line); border-radius: 18px; padding: 13px 15px; margin-bottom: 10px; }
   .card h3 { font-size: 14px; font-weight: 700; margin-bottom: 4px; }
   .card p { font-size: 12.5px; color: var(--muted); line-height: 1.45; }
   .label { font-size: 11px; letter-spacing: 1.4px; font-weight: 700; color: var(--muted); margin: 6px 4px 7px; }
 
-  .swipe { margin-top: auto; margin-bottom: 12px; height: 60px; border-radius: 20px; background: var(--accent-soft); position: relative; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; color: var(--accent); }
-  .swipe .knob { position: absolute; left: 5px; top: 5px; width: 50px; height: 50px; border-radius: 16px; background: var(--accent); display: grid; place-items: center; color: var(--accent-ink); }
+  .swipe { margin-top: auto; margin-bottom: 12px; height: 58px; border-radius: 20px; background: var(--accent-soft); position: relative; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; color: var(--accent); flex: none; }
+  .swipe .knob { position: absolute; left: 5px; top: 5px; width: 48px; height: 48px; border-radius: 16px; background: var(--accent); display: grid; place-items: center; color: var(--accent-ink); }
   .swipe .knob svg { width: 22px; height: 22px; }
   .swipe .arrows { letter-spacing: 3px; margin-left: 8px; opacity: .7; }
   .swipe.red { background: var(--danger-soft); color: var(--danger); }
@@ -141,27 +130,74 @@
   .bar { height: 7px; border-radius: 99px; background: var(--surface2); overflow: hidden; margin-top: 8px; }
   .bar i { display: block; height: 100%; background: var(--accent); border-radius: 99px; }
 
-  .pc { display: flex; align-items: center; justify-content: center; gap: 14px; padding: 16px 0 10px; }
-  .pc .dev { width: 66px; height: 66px; border-radius: 20px; background: var(--surface2); display: grid; place-items: center; color: var(--text); }
-  .pc .dev svg { width: 32px; height: 32px; }
+  .pc { display: flex; align-items: center; justify-content: center; gap: 14px; padding: 12px 0 8px; }
+  .pc .dev { width: 60px; height: 60px; border-radius: 18px; background: var(--surface2); display: grid; place-items: center; color: var(--text); }
+  .pc .dev svg { width: 30px; height: 30px; }
   .pc .link { display: flex; gap: 5px; }
   .pc .link i { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); opacity: .35; }
   .pc .link i:nth-child(2) { opacity: .6; } .pc .link i:nth-child(3) { opacity: 1; }
 
   .slotcards { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; margin-bottom: 10px; }
-  .slot { border-radius: 18px; padding: 14px; background: var(--surface); border: 1px solid var(--line); }
-  .slot .big { font-size: 34px; font-weight: 800; line-height: 1; }
+  .slot { border-radius: 18px; padding: 13px; background: var(--surface); border: 1px solid var(--line); }
+  .slot .big { font-size: 32px; font-weight: 800; line-height: 1; }
   .slot p { font-size: 11.5px; color: var(--muted); margin-top: 6px; line-height: 1.4; }
   .slot.act { border: 2px solid var(--accent); background: var(--accent-soft); }
   .slot.act .big { color: var(--accent); }
   .tag { display: inline-block; font-size: 10px; font-weight: 800; letter-spacing: 1px; padding: 3px 7px; border-radius: 6px; background: var(--accent); color: var(--accent-ink); margin-left: 6px; vertical-align: middle; }
+  .rgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .rbtn { height: 58px; border-radius: 16px; background: var(--surface); border: 1px solid var(--line); display: flex; align-items: center; gap: 10px; padding: 0 11px; }
+  .rbtn b { display: block; font-size: 13px; }
+  .rbtn span { display: block; font-size: 10.5px; color: var(--muted); }
+  .rbtn .ic { width: 32px; height: 32px; border-radius: 10px; display: grid; place-items: center; background: var(--surface2); color: var(--text); flex: none; }
+  .rbtn .ic svg { width: 17px; height: 17px; }
 
-  .rgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; }
-  .rbtn { height: 62px; border-radius: 16px; background: var(--surface); border: 1px solid var(--line); display: flex; align-items: center; gap: 10px; padding: 0 13px; font-size: 13px; font-weight: 700; }
-  .rbtn .ic { width: 34px; height: 34px; border-radius: 11px; display: grid; place-items: center; background: var(--surface2); color: var(--text); }
-  .rbtn .ic svg { width: 18px; height: 18px; }
+  /* settings */
+  .set { display: flex; flex-direction: column; gap: 8px; padding: 11px 13px; border-bottom: 1px solid var(--line); }
+  .set:last-child { border-bottom: 0; }
+  .set .h { display: flex; align-items: center; gap: 11px; }
+  .set .h .si { width: 32px; height: 32px; border-radius: 10px; display: grid; place-items: center; background: var(--accent-soft); color: var(--accent); flex: none; }
+  .set .h .si svg { width: 17px; height: 17px; }
+  .set .h .t { flex: 1; }
+  .set .h b { display: block; font-size: 13px; font-weight: 700; }
+  .set .h span { font-size: 11px; color: var(--muted); }
+  .set .h .val { font-size: 12.5px; font-weight: 700; color: var(--accent); }
+  .toggle { width: 40px; height: 24px; border-radius: 99px; background: var(--accent); position: relative; flex: none; }
+  .toggle::after { content: ""; position: absolute; right: 3px; top: 3px; width: 18px; height: 18px; border-radius: 50%; background: #fff; }
+  .slider { height: 6px; border-radius: 9px; background: var(--surface2); position: relative; margin: 2px 4px 4px 43px; }
+  .slider i { position: absolute; left: 0; top: 0; bottom: 0; width: 40%; background: var(--accent); border-radius: 9px; }
+  .slider i::after { content: ""; position: absolute; right: -8px; top: -5px; width: 16px; height: 16px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 0 3px var(--surface); }
+  .seg.in { margin-left: 43px; }
 
-  /* splash */
+  /* help sheet */
+  .dim { position: absolute; inset: 0; background: rgba(0,0,0,.55); }
+  .sheet { position: absolute; left: 0; right: 0; bottom: 0; background: var(--surface); border-radius: 26px 26px 0 0; padding: 10px 18px 16px; box-shadow: 0 -10px 30px rgba(0,0,0,.4); }
+  .sheet .grab { width: 42px; height: 5px; border-radius: 9px; background: var(--line); margin: 0 auto 12px; }
+  .sheet h3 { font-size: 18px; margin-bottom: 4px; display: flex; align-items: center; gap: 9px; }
+  .sheet h3 .q { width: 28px; height: 28px; border-radius: 9px; background: var(--accent-soft); color: var(--accent); display: grid; place-items: center; font-size: 15px; font-weight: 800; }
+  .sheet > p { font-size: 12.5px; color: var(--muted); margin-bottom: 10px; line-height: 1.45; }
+  .steps { display: flex; flex-direction: column; gap: 9px; margin-bottom: 12px; }
+  .step { display: flex; gap: 10px; align-items: flex-start; font-size: 12.5px; line-height: 1.45; }
+  .step .n { width: 22px; height: 22px; border-radius: 50%; background: var(--accent); color: var(--accent-ink); display: grid; place-items: center; font-size: 11.5px; font-weight: 800; flex: none; }
+  .step b { font-weight: 700; }
+  .tip { background: var(--warn-soft); color: var(--warn); border-radius: 12px; padding: 9px 11px; font-size: 12px; line-height: 1.45; margin-bottom: 12px; }
+
+  /* reboot-to sheet */
+  .ropt { display: flex; align-items: center; gap: 12px; padding: 11px 12px; border-radius: 16px; background: var(--surface2); margin-bottom: 7px; }
+  .ropt .ic { width: 38px; height: 38px; border-radius: 12px; display: grid; place-items: center; background: var(--surface); color: var(--text); flex: none; }
+  .ropt .ic svg { width: 19px; height: 19px; }
+  .ropt .t { flex: 1; }
+  .ropt b { display: block; font-size: 14px; }
+  .ropt span { font-size: 11.5px; color: var(--muted); line-height: 1.35; display: block; }
+  .ropt.go { background: #50cb71; color: #06230f; }
+  .ropt.go .ic { background: rgba(255,255,255,.28); color: #06230f; }
+  .ropt.go span { color: rgba(6,35,15,.75); }
+  .ropt.off { background: var(--danger-soft); color: var(--danger); }
+  .ropt.off .ic { background: transparent; color: var(--danger); }
+  .ropt.na { background: transparent; border: 1.5px dashed var(--line); opacity: .85; }
+  .ropt.na .ic { color: var(--muted); }
+  .ropt.na b { color: var(--muted); }
+  .ropt .chev { width: 16px; height: 16px; opacity: .6; }
+
   .splash { align-items: center; justify-content: center; background: radial-gradient(120% 70% at 50% 40%, #12302c 0%, #0e1116 60%); }
   .splash .sub { font-size: 15px; letter-spacing: 9px; color: #8fe3b0; margin-top: 26px; font-weight: 700; }
   .splash .ver { position: absolute; bottom: 58px; font-size: 11.5px; color: #6e7889; text-align: center; line-height: 1.6; }
@@ -182,11 +218,19 @@
   <symbol id="i-usb" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v13M9 5l3-3 3 3M7 10v2l5 3 5-3v-2M12 15v3"/><circle cx="12" cy="20" r="2"/></g></symbol>
   <symbol id="i-transfer" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h15l-4-4M20 16H5l4 4"/></g></symbol>
   <symbol id="i-term" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2.5"/><path d="m7 9 3 3-3 3M12.5 15H17"/></g></symbol>
-  <symbol id="i-adv" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h10M18 6h2M4 12h3M11 12h9M4 18h12M20 18h0"/><circle cx="16" cy="6" r="2"/><circle cx="9" cy="12" r="2"/><circle cx="18" cy="18" r="2"/></g></symbol>
+  <symbol id="i-adv" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h10M18 6h2M4 12h3M11 12h9M4 18h12"/><circle cx="16" cy="6" r="2"/><circle cx="9" cy="12" r="2"/><circle cx="18" cy="18" r="2"/></g></symbol>
   <symbol id="i-power" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v8M6.3 6.8a8 8 0 1 0 11.4 0"/></g></symbol>
   <symbol id="i-reboot" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11a8 8 0 1 0-2.3 5.7M20 4v7h-7"/></g></symbol>
   <symbol id="i-moon" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/></g></symbol>
   <symbol id="i-sun" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></g></symbol>
+  <symbol id="i-gear" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></g></symbol>
+  <symbol id="i-globe" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></g></symbol>
+  <symbol id="i-clock" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></g></symbol>
+  <symbol id="i-palette" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a9 9 0 1 0 0 18c1.1 0 1.6-.8 1.6-1.6 0-.5-.2-.8-.4-1.1-.3-.3-.4-.7-.4-1.1 0-.9.7-1.6 1.6-1.6H16a5 5 0 0 0 5-5c0-4.2-4-7.6-9-7.6z"/><circle cx="7.5" cy="11.5" r="1"/><circle cx="10.5" cy="7.5" r="1"/><circle cx="15.5" cy="8" r="1"/></g></symbol>
+  <symbol id="i-bright" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 3v1.5M12 19.5V21M3 12h1.5M19.5 12H21M5.6 5.6l1 1M17.4 17.4l1 1M5.6 18.4l1-1M17.4 6.6l1-1"/></g></symbol>
+  <symbol id="i-vib" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="4" width="10" height="16" rx="2"/><path d="M3 9v6M21 9v6"/></g></symbol>
+  <symbol id="i-timer" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4M9 2h6"/></g></symbol>
+  <symbol id="i-info" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5h.01"/></g></symbol>
   <symbol id="i-back" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></g></symbol>
   <symbol id="i-home" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11 12 4l8 7v9H4z"/></g></symbol>
   <symbol id="i-log" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 5h14M5 10h14M5 15h9M5 20h6"/></g></symbol>
@@ -194,27 +238,28 @@
   <symbol id="i-img" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></g></symbol>
   <symbol id="i-up" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14 4 9l5-5M4 9h11a5 5 0 0 1 0 10h-3"/></g></symbol>
   <symbol id="i-check" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7"/></g></symbol>
+  <symbol id="i-chevup" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m6 15 6-6 6 6"/></g></symbol>
+  <symbol id="i-lock" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></g></symbol>
   <symbol id="i-chev" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m9 5 7 7-7 7"/></g></symbol>
   <symbol id="i-phone" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="2" width="12" height="20" rx="3"/><path d="M11 18.5h2"/></g></symbol>
   <symbol id="i-pc" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="4" width="19" height="13" rx="2"/><path d="M8 21h8M12 17v4"/></g></symbol>
   <symbol id="i-bootl" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="3"/><path d="M9 9h6v6H9z"/></g></symbol>
-  <symbol id="i-cross" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18M3 12h18"/></g></symbol>
 </svg>
 
 <div class="page-head">
   <img src="assets/asem_logo_192.png" width="54" height="54" alt="">
   <div>
-    <h1>ASEM Recovery &mdash; UI mockup v1</h1>
+    <h1>ASEM Recovery &mdash; UI mockup v2</h1>
     <p>Infinix NOTE 50 Pro 4G (X6855) &middot; 1080&times;2436 &middot; centre punch hole &middot; based on TWRP</p>
   </div>
 </div>
-<p class="note">Design limits respected so this can really be built with the TWRP theme engine: flat colours, PNG icons, fixed-size tiles and buttons,
-swipe sliders, live variables (clock, battery, CPU temp, slot). Dark and light are two colour sets switched by one setting.
-Rounded corners are drawn as images. Times and file names are sample data.</p>
+<p class="note">v2: every tile and option explains itself (hint line), every screen has a one-line description and a <b>?</b> help sheet,
+new Settings screen (language English / العربية, clock 12-hour default / 24-hour, theme, brightness, vibration, timeout) and an Arabic right-to-left Home.
+Built with the TWRP theme engine: flat colours, PNG icons, fixed tiles, swipe sliders, live clock/battery/slot. Times and file names are sample data.</p>
 
 <div class="grid">
 
-<!-- 1. Splash -->
+<!-- 1 Splash -->
 <div>
 <div class="frame"><div class="phone dark splash">
   <img src="assets/asem_logo.png" width="150" height="150" alt="">
@@ -222,20 +267,20 @@ Rounded corners are drawn as images. Times and file names are sample data.</p>
   <div class="load"><i></i></div>
   <div class="ver">R1 &middot; Infinix NOTE 50 Pro 4G<br>based on TWRP 3.7 &middot; android-14.1</div>
 </div></div>
-<div class="cap">1 &middot; Boot splash<span>logo + loading bar while recovery starts</span></div>
+<div class="cap">1 &middot; Boot splash<span>your logo + loading bar while recovery starts</span></div>
 </div>
 
-<!-- 2. Home dark -->
+<!-- 2 Home dark EN -->
 <div>
 <div class="frame"><div class="phone dark">
-  <div class="status"><span>21:42</span><span class="hole"></span><span class="r"><span class="muted">CPU 38&deg;C</span><span class="batt"><i></i>87%</span></span></div>
+  <div class="status"><span>9:42 PM</span><span class="hole"></span><span class="r"><span class="muted">CPU 38&deg;C</span><span class="batt"><i></i>87%</span></span></div>
   <div class="body">
     <div class="topbar">
       <div class="brand"><img src="assets/asem_logo_96.png" width="36" height="36" alt=""><div><b>ASEM</b><small>RECOVERY</small></div></div>
-      <div class="iconbtn"><svg><use href="#i-sun"/></svg></div>
+      <div class="tools"><div class="iconbtn"><svg><use href="#i-sun"/></svg></div><div class="iconbtn"><svg><use href="#i-gear"/></svg></div></div>
     </div>
     <div class="hero">
-      <div class="clock">21<em>:</em>42</div>
+      <div class="clock">9<em>:</em>42<small>PM</small></div>
       <div class="date">Friday, 16 October 2026</div>
       <div class="chips">
         <span class="chip ok"><span class="dot"></span>Slot B</span>
@@ -245,79 +290,120 @@ Rounded corners are drawn as images. Times and file names are sample data.</p>
       </div>
     </div>
     <div class="tiles">
-      <div class="tile"><div class="ic"><svg><use href="#i-install"/></svg></div>Install</div>
-      <div class="tile w"><div class="ic"><svg><use href="#i-wipe"/></svg></div>Wipe</div>
-      <div class="tile b"><div class="ic"><svg><use href="#i-backup"/></svg></div>Backup</div>
-      <div class="tile b"><div class="ic"><svg><use href="#i-restore"/></svg></div>Restore</div>
-      <div class="tile"><div class="ic"><svg><use href="#i-mount"/></svg></div>Mount</div>
-      <div class="tile"><div class="ic"><svg><use href="#i-files"/></svg></div>Files</div>
-      <div class="tile y"><div class="ic"><svg><use href="#i-bolt"/></svg></div>Fastboot</div>
-      <div class="tile"><div class="ic"><svg><use href="#i-usb"/></svg></div>ADB Sideload</div>
-      <div class="tile"><div class="ic"><svg><use href="#i-transfer"/></svg></div>ASEM Transfer</div>
-      <div class="tile y"><div class="ic"><span class="ab">A/B</span></div>Slots</div>
-      <div class="tile"><div class="ic"><svg><use href="#i-term"/></svg></div>Terminal</div>
-      <div class="tile"><div class="ic"><svg><use href="#i-adv"/></svg></div>Advanced</div>
+      <div class="tile"><div class="ic"><svg><use href="#i-install"/></svg></div>Install<i>Flash a ROM zip or image</i></div>
+      <div class="tile w"><div class="ic"><svg><use href="#i-wipe"/></svg></div>Wipe<i>Clean before a new ROM</i></div>
+      <div class="tile b"><div class="ic"><svg><use href="#i-backup"/></svg></div>Backup<i>Save partitions to a file</i></div>
+      <div class="tile b"><div class="ic"><svg><use href="#i-restore"/></svg></div>Restore<i>Bring a saved backup back</i></div>
+      <div class="tile"><div class="ic"><svg><use href="#i-mount"/></svg></div>Mount<i>Open or close partitions</i></div>
+      <div class="tile"><div class="ic"><svg><use href="#i-files"/></svg></div>Files<i>Browse, copy, delete</i></div>
+      <div class="tile y"><div class="ic"><svg><use href="#i-bolt"/></svg></div>Fastboot<i>Flash from your PC</i></div>
+      <div class="tile"><div class="ic"><svg><use href="#i-usb"/></svg></div>ADB Sideload<i>Send a zip from your PC</i></div>
+      <div class="tile"><div class="ic"><svg><use href="#i-transfer"/></svg></div>ASEM Transfer<i>Copy files from your PC</i></div>
+      <div class="tile y"><div class="ic"><span class="ab">A/B</span></div>Slots<i>Switch between A and B</i></div>
+      <div class="tile"><div class="ic"><svg><use href="#i-term"/></svg></div>Terminal<i>Type shell commands</i></div>
+      <div class="tile"><div class="ic"><svg><use href="#i-adv"/></svg></div>Advanced<i>Logs, fix tools, extras</i></div>
     </div>
     <div class="bottom">
-      <div class="btn primary"><svg><use href="#i-reboot"/></svg>Reboot system</div>
+      <div class="btn primary"><svg><use href="#i-reboot"/></svg>Reboot to&hellip;<svg><use href="#i-chevup"/></svg></div>
       <div class="btn square danger"><svg><use href="#i-power"/></svg></div>
     </div>
   </div>
   <div class="nav"><svg><use href="#i-back"/></svg><svg class="on"><use href="#i-home"/></svg><svg><use href="#i-log"/></svg></div>
 </div></div>
-<div class="cap">2 &middot; Home &mdash; dark<span>big clock, phone status chips, 12 touch tiles</span></div>
+<div class="cap">2 &middot; Home &mdash; dark, English<span>every tile says what it does &middot; 12-hour clock</span></div>
 </div>
 
-<!-- 3. Home light -->
+<!-- 3 Home light AR -->
 <div>
-<div class="frame"><div class="phone light">
-  <div class="status"><span>09:15</span><span class="hole"></span><span class="r"><span class="muted">CPU 34&deg;C</span><span class="batt"><i></i>92%</span></span></div>
+<div class="frame"><div class="phone light rtl" dir="rtl">
+  <div class="status"><span>9:15 ص</span><span class="hole"></span><span class="r"><span class="muted">المعالج 34&deg;</span><span class="batt"><i></i>92%</span></span></div>
   <div class="body">
     <div class="topbar">
       <div class="brand"><img src="assets/asem_logo_96.png" width="36" height="36" alt=""><div><b>ASEM</b><small>RECOVERY</small></div></div>
-      <div class="iconbtn"><svg><use href="#i-moon"/></svg></div>
+      <div class="tools"><div class="iconbtn"><svg><use href="#i-moon"/></svg></div><div class="iconbtn"><svg><use href="#i-gear"/></svg></div></div>
     </div>
     <div class="hero">
-      <div class="clock">09<em>:</em>15</div>
-      <div class="date">Friday, 16 October 2026</div>
+      <div class="clock"><span dir="ltr">9<em>:</em>15</span><small>صباحًا</small></div>
+      <div class="date">الجمعة، 16 أكتوبر 2026</div>
       <div class="chips">
-        <span class="chip ok"><span class="dot"></span>Slot B</span>
-        <span class="chip">Android 16</span>
-        <span class="chip ok"><span class="dot"></span>Data decrypted</span>
+        <span class="chip ok"><span class="dot"></span>الخانة B</span>
+        <span class="chip">أندرويد 16</span>
+        <span class="chip ok"><span class="dot"></span>البيانات مفكوكة التشفير</span>
         <span class="chip info"><span class="dot"></span>USB: MTP + ADB</span>
       </div>
     </div>
     <div class="tiles">
-      <div class="tile"><div class="ic"><svg><use href="#i-install"/></svg></div>Install</div>
-      <div class="tile w"><div class="ic"><svg><use href="#i-wipe"/></svg></div>Wipe</div>
-      <div class="tile b"><div class="ic"><svg><use href="#i-backup"/></svg></div>Backup</div>
-      <div class="tile b"><div class="ic"><svg><use href="#i-restore"/></svg></div>Restore</div>
-      <div class="tile"><div class="ic"><svg><use href="#i-mount"/></svg></div>Mount</div>
-      <div class="tile"><div class="ic"><svg><use href="#i-files"/></svg></div>Files</div>
-      <div class="tile y"><div class="ic"><svg><use href="#i-bolt"/></svg></div>Fastboot</div>
-      <div class="tile"><div class="ic"><svg><use href="#i-usb"/></svg></div>ADB Sideload</div>
-      <div class="tile"><div class="ic"><svg><use href="#i-transfer"/></svg></div>ASEM Transfer</div>
-      <div class="tile y"><div class="ic"><span class="ab">A/B</span></div>Slots</div>
-      <div class="tile"><div class="ic"><svg><use href="#i-term"/></svg></div>Terminal</div>
-      <div class="tile"><div class="ic"><svg><use href="#i-adv"/></svg></div>Advanced</div>
+      <div class="tile"><div class="ic"><svg><use href="#i-install"/></svg></div>تثبيت<i>تفليش روم أو صورة</i></div>
+      <div class="tile w"><div class="ic"><svg><use href="#i-wipe"/></svg></div>مسح<i>تنظيف قبل روم جديد</i></div>
+      <div class="tile b"><div class="ic"><svg><use href="#i-backup"/></svg></div>نسخ احتياطي<i>حفظ الأقسام في ملف</i></div>
+      <div class="tile b"><div class="ic"><svg><use href="#i-restore"/></svg></div>استعادة<i>إرجاع نسخة محفوظة</i></div>
+      <div class="tile"><div class="ic"><svg><use href="#i-mount"/></svg></div>تركيب<i>فتح وإغلاق الأقسام</i></div>
+      <div class="tile"><div class="ic"><svg><use href="#i-files"/></svg></div>الملفات<i>تصفح ونسخ وحذف</i></div>
+      <div class="tile y"><div class="ic"><svg><use href="#i-bolt"/></svg></div>فاستبوت<i>التفليش من الكمبيوتر</i></div>
+      <div class="tile"><div class="ic"><svg><use href="#i-usb"/></svg></div>سايدلود ADB<i>إرسال ملف من الكمبيوتر</i></div>
+      <div class="tile"><div class="ic"><svg><use href="#i-transfer"/></svg></div>نقل ASEM<i>نسخ ملفات من الكمبيوتر</i></div>
+      <div class="tile y"><div class="ic"><span class="ab">A/B</span></div>الخانات<i>التبديل بين A و B</i></div>
+      <div class="tile"><div class="ic"><svg><use href="#i-term"/></svg></div>الطرفية<i>كتابة أوامر</i></div>
+      <div class="tile"><div class="ic"><svg><use href="#i-adv"/></svg></div>متقدم<i>سجلات وأدوات إصلاح</i></div>
     </div>
     <div class="bottom">
-      <div class="btn primary"><svg><use href="#i-reboot"/></svg>Reboot system</div>
+      <div class="btn primary"><svg><use href="#i-reboot"/></svg>إعادة التشغيل إلى&hellip;<svg><use href="#i-chevup"/></svg></div>
       <div class="btn square danger"><svg><use href="#i-power"/></svg></div>
     </div>
   </div>
-  <div class="nav"><svg><use href="#i-back"/></svg><svg class="on"><use href="#i-home"/></svg><svg><use href="#i-log"/></svg></div>
+  <div class="nav"><svg class="flip"><use href="#i-back"/></svg><svg class="on"><use href="#i-home"/></svg><svg><use href="#i-log"/></svg></div>
 </div></div>
-<div class="cap">3 &middot; Home &mdash; light<span>same layout, one tap on the moon/sun switches theme</span></div>
+<div class="cap">3 &middot; Home &mdash; light, Arabic<span>right-to-left layout, Arabic hints, 12-hour clock (ص / م)</span></div>
 </div>
 
-<!-- 4. Install file picker -->
+<!-- 4 Settings -->
 <div>
 <div class="frame"><div class="phone dark">
-  <div class="status"><span>21:44</span><span class="hole"></span><span class="r"><span class="muted">CPU 39&deg;C</span><span class="batt"><i></i>87%</span></span></div>
+  <div class="status"><span>9:43 PM</span><span class="hole"></span><span class="r"><span class="muted">CPU 38&deg;C</span><span class="batt"><i></i>87%</span></span></div>
   <div class="body">
-    <div class="title"><div class="back"><svg><use href="#i-back"/></svg></div><h2>Install</h2></div>
-    <div class="seg"><div class="on">ZIP</div><div>Image</div></div>
+    <div class="title"><div class="back"><svg><use href="#i-back"/></svg></div><h2>Settings</h2><div class="help">?</div></div>
+    <p class="lead">Change how ASEM Recovery looks and behaves. Saved automatically and kept after reboot.</p>
+    <div class="list">
+      <div class="set">
+        <div class="h"><div class="si"><svg><use href="#i-globe"/></svg></div><div class="t"><b>Language</b><span>Menus, hints and help</span></div></div>
+        <div class="seg in"><div class="on">English</div><div>العربية</div></div>
+      </div>
+      <div class="set">
+        <div class="h"><div class="si"><svg><use href="#i-clock"/></svg></div><div class="t"><b>Clock format</b><span>Now showing 9:43 PM</span></div></div>
+        <div class="seg in"><div class="on">12-hour</div><div>24-hour</div></div>
+      </div>
+      <div class="set">
+        <div class="h"><div class="si"><svg><use href="#i-palette"/></svg></div><div class="t"><b>Theme</b><span>Dark is easier on the eyes at night</span></div></div>
+        <div class="seg in"><div class="on">Dark</div><div>Light</div></div>
+      </div>
+      <div class="set">
+        <div class="h"><div class="si"><svg><use href="#i-bright"/></svg></div><div class="t"><b>Brightness</b><span>Screen brightness in recovery</span></div><span class="val">40%</span></div>
+        <div class="slider"><i></i></div>
+      </div>
+      <div class="set">
+        <div class="h"><div class="si"><svg><use href="#i-vib"/></svg></div><div class="t"><b>Vibrate on touch</b><span>Short buzz when you tap a button</span></div><div class="toggle"></div></div>
+      </div>
+      <div class="set">
+        <div class="h"><div class="si"><svg><use href="#i-timer"/></svg></div><div class="t"><b>Screen timeout</b><span>Dim the screen after no touch</span></div><span class="val">60 s</span></div>
+      </div>
+      <div class="set">
+        <div class="h"><div class="si"><svg><use href="#i-info"/></svg></div><div class="t"><b>About</b><span>ASEM Recovery R1 &middot; based on TWRP 3.7 (android-14.1)</span></div></div>
+      </div>
+    </div>
+  </div>
+  <div class="nav"><svg><use href="#i-back"/></svg><svg><use href="#i-home"/></svg><svg><use href="#i-log"/></svg></div>
+</div></div>
+<div class="cap">4 &middot; Settings<span>language, 12/24-hour clock, theme, brightness, vibration</span></div>
+</div>
+
+<!-- 5 Install -->
+<div>
+<div class="frame"><div class="phone dark">
+  <div class="status"><span>9:44 PM</span><span class="hole"></span><span class="r"><span class="muted">CPU 39&deg;C</span><span class="batt"><i></i>87%</span></span></div>
+  <div class="body">
+    <div class="title"><div class="back"><svg><use href="#i-back"/></svg></div><h2>Install</h2><div class="help">?</div></div>
+    <p class="lead">Pick a file to flash. <b>ZIP</b> = ROM, GApps, Magisk. <b>Image</b> = a single .img file.</p>
+    <div class="seg mb"><div class="on">ZIP</div><div>Image</div></div>
     <div class="storage">
       <span class="chip ok"><span class="dot"></span>Internal</span>
       <span class="chip">ASEM Transfer</span>
@@ -325,11 +411,10 @@ Rounded corners are drawn as images. Times and file names are sample data.</p>
     </div>
     <div class="crumb"><svg width="14" height="14"><use href="#i-files"/></svg>/sdcard &rsaquo; <b>Download</b></div>
     <div class="list">
-      <div class="row"><div class="fi"><svg><use href="#i-up"/></svg></div><div class="t"><b>..</b><span>Up one level</span></div></div>
-      <div class="row sel"><div class="fi zip"><svg><use href="#i-zip"/></svg></div><div class="t"><b>lineage-23.2-20261016-UNOFFICIAL-X6855.zip</b><span>1.62 GB &middot; today 20:51</span></div><div class="check"><svg><use href="#i-check"/></svg></div></div>
-      <div class="row"><div class="fi zip"><svg><use href="#i-zip"/></svg></div><div class="t"><b>Magisk-v30.2.zip</b><span>11.4 MB &middot; 12 Oct</span></div><div class="check"></div></div>
-      <div class="row"><div class="fi zip"><svg><use href="#i-zip"/></svg></div><div class="t"><b>MindTheGapps-16.0.0-arm64.zip</b><span>412 MB &middot; 14 Oct</span></div><div class="check"></div></div>
-      <div class="row"><div class="fi img"><svg><use href="#i-img"/></svg></div><div class="t"><b>ASEM_Recovery_X6855_R2.img</b><span>64 MB &middot; image</span></div><div class="check"></div></div>
+      <div class="row"><div class="fi"><svg><use href="#i-up"/></svg></div><div class="t"><b>..</b><span>Up one folder</span></div></div>
+      <div class="row sel"><div class="fi zip"><svg><use href="#i-zip"/></svg></div><div class="t"><b>lineage-23.2-20261016-UNOFFICIAL-X6855.zip</b><span>1.62 GB &middot; ROM &middot; today 8:51 PM</span></div><div class="check"><svg><use href="#i-check"/></svg></div></div>
+      <div class="row"><div class="fi zip"><svg><use href="#i-zip"/></svg></div><div class="t"><b>MindTheGapps-16.0.0-arm64.zip</b><span>412 MB &middot; Google apps</span></div><div class="check"></div></div>
+      <div class="row"><div class="fi zip"><svg><use href="#i-zip"/></svg></div><div class="t"><b>Magisk-v30.2.zip</b><span>11.4 MB &middot; root</span></div><div class="check"></div></div>
       <div class="row"><div class="fi"><svg><use href="#i-files"/></svg></div><div class="t"><b>Backups</b><span>folder</span></div></div>
     </div>
     <div class="bottom">
@@ -339,44 +424,77 @@ Rounded corners are drawn as images. Times and file names are sample data.</p>
   </div>
   <div class="nav"><svg><use href="#i-back"/></svg><svg><use href="#i-home"/></svg><svg><use href="#i-log"/></svg></div>
 </div></div>
-<div class="cap">4 &middot; Install &mdash; file picker<span>ZIP or Image, pick storage, queue several files</span></div>
+<div class="cap">5 &middot; Install &mdash; file picker<span>description under the title, file types explained</span></div>
 </div>
 
-<!-- 5. Flash image confirm -->
+<!-- 6 Help sheet -->
 <div>
 <div class="frame"><div class="phone dark">
-  <div class="status"><span>21:46</span><span class="hole"></span><span class="r"><span class="muted">CPU 39&deg;C</span><span class="batt"><i></i>86%</span></span></div>
+  <div class="status"><span>9:44 PM</span><span class="hole"></span><span class="r"><span class="muted">CPU 39&deg;C</span><span class="batt"><i></i>87%</span></span></div>
   <div class="body">
-    <div class="title"><div class="back"><svg><use href="#i-back"/></svg></div><h2>Flash image</h2></div>
-    <div class="card">
+    <div class="title"><div class="back"><svg><use href="#i-back"/></svg></div><h2>Install</h2><div class="help">?</div></div>
+    <p class="lead">Pick a file to flash. <b>ZIP</b> = ROM, GApps, Magisk. <b>Image</b> = a single .img file.</p>
+    <div class="seg mb"><div class="on">ZIP</div><div>Image</div></div>
+    <div class="list">
+      <div class="row sel"><div class="fi zip"><svg><use href="#i-zip"/></svg></div><div class="t"><b>lineage-23.2-20261016-UNOFFICIAL-X6855.zip</b><span>1.62 GB</span></div><div class="check"><svg><use href="#i-check"/></svg></div></div>
+    </div>
+  </div>
+  <div class="dim"></div>
+  <div class="sheet">
+    <div class="grab"></div>
+    <h3><span class="q">?</span>How to install a ROM</h3>
+    <p>Install writes a file to your phone. Follow the steps in order.</p>
+    <div class="steps">
+      <div class="step"><span class="n">1</span><span><b>Back up first.</b> Home &rsaquo; Backup &rsaquo; Boot + Vendor Boot + NVRAM.</span></div>
+      <div class="step"><span class="n">2</span><span><b>Wipe</b> &rsaquo; Factory reset when you change to a different ROM.</span></div>
+      <div class="step"><span class="n">3</span><span>Choose <b>ZIP</b>, tap the ROM file, then <b>Install</b>.</span></div>
+      <div class="step"><span class="n">4</span><span><b>Swipe</b> to start. Do not unplug or power off until it says done.</span></div>
+      <div class="step"><span class="n">5</span><span>Add GApps, then Magisk last &mdash; use <b>Add to queue</b>.</span></div>
+    </div>
+    <div class="tip">No file on the phone? Use <b>ASEM Transfer</b> to copy it from your PC, or <b>Fastboot</b> to flash from the PC.</div>
+    <div class="btn primary" style="width:100%">Got it</div>
+  </div>
+</div></div>
+<div class="cap">6 &middot; Help sheet (tap ?)<span>step-by-step guide on every screen</span></div>
+</div>
+
+<!-- 7 Flash image -->
+<div>
+<div class="frame"><div class="phone dark">
+  <div class="status"><span>9:46 PM</span><span class="hole"></span><span class="r"><span class="muted">CPU 39&deg;C</span><span class="batt"><i></i>86%</span></span></div>
+  <div class="body">
+    <div class="title"><div class="back"><svg><use href="#i-back"/></svg></div><h2>Flash image</h2><div class="help">?</div></div>
+    <p class="lead">Choose which partition this image goes to. Wrong choice can stop the phone from booting.</p>
+    <div class="card" style="margin-bottom:8px">
       <h3>ASEM_Recovery_X6855_R2.img</h3>
-      <p>64 MB &middot; vendor_boot image (header v4) &middot; checked OK</p>
+      <p>64 MB &middot; looks like a vendor_boot image &middot; check OK</p>
     </div>
-    <div class="label">FLASH TO PARTITION</div>
+    <div class="label">FLASH TO</div>
     <div class="list">
-      <div class="row"><div class="radio"></div><div class="t"><b>Boot</b><span>kernel</span></div></div>
-      <div class="row sel"><div class="radio on"></div><div class="t"><b>Vendor Boot (recovery)</b><span>slot B &middot; current backup saved first</span></div></div>
-      <div class="row"><div class="radio"></div><div class="t"><b>DTBO</b><span>device tree overlays</span></div></div>
-      <div class="row"><div class="radio"></div><div class="t"><b>Boot logo</b><span>logo partition</span></div></div>
+      <div class="row"><div class="radio"></div><div class="t"><b>Boot</b><span>Kernel &mdash; for Magisk / kernels</span></div></div>
+      <div class="row sel"><div class="radio on"></div><div class="t"><b>Vendor Boot (recovery)</b><span>Recovery lives here &mdash; slot B</span></div></div>
+      <div class="row"><div class="radio"></div><div class="t"><b>DTBO</b><span>Hardware overlay &mdash; rarely needed</span></div></div>
+      <div class="row"><div class="radio"></div><div class="t"><b>Boot logo</b><span>Picture shown at power on</span></div></div>
     </div>
-    <div class="label" style="margin-top:12px">OPTIONS</div>
+    <div class="label" style="margin-top:10px">OPTIONS</div>
     <div class="list">
-      <div class="row"><div class="box on"><svg><use href="#i-check"/></svg></div><div class="t"><b>Back up current image first</b></div></div>
-      <div class="row"><div class="box"></div><div class="t"><b>Flash to both slots (A and B)</b></div></div>
+      <div class="row"><div class="box on"><svg><use href="#i-check"/></svg></div><div class="t"><b>Back up current image first</b><span>Lets you undo this flash</span></div></div>
+      <div class="row"><div class="box"></div><div class="t"><b>Flash to both slots</b><span>Same image on A and B</span></div></div>
     </div>
     <div class="swipe"><div class="knob"><svg><use href="#i-chev"/></svg></div>Swipe to flash<span class="arrows">&rsaquo;&rsaquo;&rsaquo;</span></div>
   </div>
   <div class="nav"><svg><use href="#i-back"/></svg><svg><use href="#i-home"/></svg><svg><use href="#i-log"/></svg></div>
 </div></div>
-<div class="cap">5 &middot; Flash image &mdash; confirm<span>safe choices, auto-backup, swipe to confirm</span></div>
+<div class="cap">7 &middot; Flash image &mdash; confirm<span>each partition explained, auto-backup</span></div>
 </div>
 
-<!-- 6. ASEM Transfer -->
+<!-- 8 ASEM Transfer -->
 <div>
 <div class="frame"><div class="phone light">
-  <div class="status"><span>09:20</span><span class="hole"></span><span class="r"><span class="muted">CPU 35&deg;C</span><span class="batt"><i></i>91%</span></span></div>
+  <div class="status"><span>9:20 AM</span><span class="hole"></span><span class="r"><span class="muted">CPU 35&deg;C</span><span class="batt"><i></i>91%</span></span></div>
   <div class="body">
-    <div class="title"><div class="back"><svg><use href="#i-back"/></svg></div><h2>ASEM Transfer</h2></div>
+    <div class="title"><div class="back"><svg><use href="#i-back"/></svg></div><h2>ASEM Transfer</h2><div class="help">?</div></div>
+    <p class="lead">Copy files from your PC with a USB cable. Works even when the phone is wiped or encrypted.</p>
     <div class="card" style="text-align:center">
       <div class="pc">
         <div class="dev"><svg><use href="#i-pc"/></svg></div>
@@ -384,17 +502,17 @@ Rounded corners are drawn as images. Times and file names are sample data.</p>
         <div class="dev"><svg><use href="#i-phone"/></svg></div>
       </div>
       <h3>Connected to PC</h3>
-      <p>Open &ldquo;Infinix X6855 &rsaquo; ASEM Transfer&rdquo; on your PC<br>and drop the ROM there. Works even when data is wiped or encrypted.</p>
+      <p>On the PC open &ldquo;Infinix X6855 &rsaquo; ASEM Transfer&rdquo; and drop the ROM there.</p>
     </div>
     <div class="card">
       <h3>Storage in RAM</h3>
-      <p>5.8 GB free of 6.0 GB &middot; cleared on reboot</p>
+      <p>5.8 GB free of 6.0 GB &middot; emptied when the phone restarts</p>
       <div class="bar"><i style="width:4%"></i></div>
     </div>
     <div class="label">RECEIVED</div>
     <div class="list">
       <div class="row"><div class="fi zip"><svg><use href="#i-zip"/></svg></div><div class="t"><b>lineage-23.2-20261016-UNOFFICIAL-X6855.zip</b><span>copying&hellip; 1.04 of 1.62 GB</span><div class="bar"><i style="width:64%"></i></div></div></div>
-      <div class="row"><div class="fi zip"><svg><use href="#i-zip"/></svg></div><div class="t"><b>Magisk-v30.2.zip</b><span>11.4 MB &middot; done</span></div><div class="check" style="border:0;background:var(--accent);display:grid;place-items:center;color:#fff"><svg width="13" height="13"><use href="#i-check"/></svg></div></div>
+      <div class="row"><div class="fi zip"><svg><use href="#i-zip"/></svg></div><div class="t"><b>Magisk-v30.2.zip</b><span>11.4 MB &middot; done</span></div><div class="check on"><svg><use href="#i-check"/></svg></div></div>
     </div>
     <div class="bottom">
       <div class="btn flex">Stop sharing</div>
@@ -403,79 +521,81 @@ Rounded corners are drawn as images. Times and file names are sample data.</p>
   </div>
   <div class="nav"><svg><use href="#i-back"/></svg><svg><use href="#i-home"/></svg><svg><use href="#i-log"/></svg></div>
 </div></div>
-<div class="cap">6 &middot; ASEM Transfer<span>copy ROMs from the PC into RAM storage</span></div>
+<div class="cap">8 &middot; ASEM Transfer<span>copy ROMs from the PC into RAM storage</span></div>
 </div>
 
-<!-- 7. Slots & reboot -->
+<!-- 9 Slots -->
 <div>
 <div class="frame"><div class="phone light">
-  <div class="status"><span>09:24</span><span class="hole"></span><span class="r"><span class="muted">CPU 35&deg;C</span><span class="batt"><i></i>91%</span></span></div>
+  <div class="status"><span>9:24 AM</span><span class="hole"></span><span class="r"><span class="muted">CPU 35&deg;C</span><span class="batt"><i></i>91%</span></span></div>
   <div class="body">
-    <div class="title"><div class="back"><svg><use href="#i-back"/></svg></div><h2>Slots &amp; reboot</h2></div>
+    <div class="title"><div class="back"><svg><use href="#i-back"/></svg></div><h2>Slots &amp; reboot</h2><div class="help">?</div></div>
+    <p class="lead">Your phone has two copies of the system (A and B). The active one starts at power on.</p>
     <div class="slotcards">
       <div class="slot"><div class="big">A</div><p>XOS 15.1.2<br>bootable</p></div>
-      <div class="slot act"><div class="big">B <span class="tag">ACTIVE</span></div><p>XOS 16.3.0 SP15<br>bootable &middot; successful</p></div>
+      <div class="slot act"><div class="big">B <span class="tag">ACTIVE</span></div><p>XOS 16.3.0 SP15<br>bootable &middot; working</p></div>
     </div>
-    <div class="btn" style="margin-bottom:14px"><span class="ab" style="font-weight:800">A/B</span>&nbsp;Make slot A active</div>
+    <div class="btn" style="margin-bottom:12px"><span class="ab">A/B</span>&nbsp;Make slot A active</div>
     <div class="label">REBOOT TO</div>
     <div class="rgrid">
-      <div class="rbtn"><div class="ic"><svg><use href="#i-reboot"/></svg></div>System</div>
-      <div class="rbtn"><div class="ic"><svg><use href="#i-restore"/></svg></div>Recovery</div>
-      <div class="rbtn"><div class="ic"><svg><use href="#i-bootl"/></svg></div>Bootloader</div>
-      <div class="rbtn"><div class="ic"><svg><use href="#i-bolt"/></svg></div>Fastbootd</div>
+      <div class="rbtn"><div class="ic"><svg><use href="#i-reboot"/></svg></div><div><b>System</b><span>Start Android</span></div></div>
+      <div class="rbtn"><div class="ic"><svg><use href="#i-restore"/></svg></div><div><b>Recovery</b><span>Restart ASEM</span></div></div>
+      <div class="rbtn"><div class="ic"><svg><use href="#i-bootl"/></svg></div><div><b>Bootloader</b><span>Rescue mode for PC</span></div></div>
+      <div class="rbtn"><div class="ic"><svg><use href="#i-bolt"/></svg></div><div><b>Fastbootd</b><span>Flash ROM from PC</span></div></div>
     </div>
-    <div class="card" style="margin-top:12px">
+    <div class="card" style="margin-top:10px">
       <h3>Safe by design</h3>
-      <p>No buttons for preloader, LK, TEE or seccfg. Bootloader fastboot always stays reachable to undo.</p>
+      <p>No buttons for preloader, LK, TEE or seccfg. Bootloader mode always stays reachable to undo.</p>
     </div>
     <div class="swipe red"><div class="knob"><svg><use href="#i-power"/></svg></div>Swipe to power off<span class="arrows">&rsaquo;&rsaquo;&rsaquo;</span></div>
   </div>
   <div class="nav"><svg><use href="#i-back"/></svg><svg><use href="#i-home"/></svg><svg><use href="#i-log"/></svg></div>
 </div></div>
-<div class="cap">7 &middot; Slots &amp; reboot<span>see both slots, switch with one tap</span></div>
+<div class="cap">9 &middot; Slots &amp; reboot<span>A/B explained in one sentence, each reboot target explained</span></div>
 </div>
 
-<!-- 8. Wipe -->
+<!-- 10 Wipe -->
 <div>
 <div class="frame"><div class="phone dark">
-  <div class="status"><span>21:50</span><span class="hole"></span><span class="r"><span class="muted">CPU 38&deg;C</span><span class="batt"><i></i>85%</span></span></div>
+  <div class="status"><span>9:50 PM</span><span class="hole"></span><span class="r"><span class="muted">CPU 38&deg;C</span><span class="batt"><i></i>85%</span></span></div>
   <div class="body">
-    <div class="title"><div class="back"><svg><use href="#i-back"/></svg></div><h2>Wipe</h2></div>
+    <div class="title"><div class="back"><svg><use href="#i-back"/></svg></div><h2>Wipe</h2><div class="help">?</div></div>
+    <p class="lead">Erase data before installing a different ROM. Tick what to erase, then swipe.</p>
     <div class="card" style="border-color:transparent;background:var(--warn-soft)">
-      <h3 style="color:var(--warn)">Before a new ROM</h3>
-      <p>Factory reset keeps your photos in /sdcard. Format data erases everything and removes encryption.</p>
+      <h3 style="color:var(--warn)">Which one do I need?</h3>
+      <p>New ROM: <b>Factory reset</b> (keeps photos). Problems with encryption: <b>Format data</b> (erases everything).</p>
     </div>
     <div class="list">
-      <div class="row sel"><div class="box on"><svg><use href="#i-check"/></svg></div><div class="t"><b>Factory reset</b><span>data (except /sdcard), cache, dalvik</span></div></div>
-      <div class="row"><div class="box"></div><div class="t"><b>Dalvik / ART cache</b><span>app cache only</span></div></div>
-      <div class="row"><div class="box"></div><div class="t"><b>Metadata</b><span>encryption keys &middot; advanced</span></div></div>
-      <div class="row"><div class="box"></div><div class="t"><b>USB OTG</b><span>not connected</span></div></div>
+      <div class="row sel"><div class="box on"><svg><use href="#i-check"/></svg></div><div class="t"><b>Factory reset</b><span>Apps + settings &middot; keeps /sdcard</span></div></div>
+      <div class="row"><div class="box"></div><div class="t"><b>Dalvik / ART cache</b><span>App cache &middot; safe, fixes slowness</span></div></div>
+      <div class="row"><div class="box"></div><div class="t"><b>Metadata</b><span>Encryption keys &middot; experts only</span></div></div>
+      <div class="row"><div class="box"></div><div class="t"><b>USB OTG</b><span>Erase the USB stick</span></div></div>
     </div>
     <div class="btn danger" style="margin-top:10px">Format data&hellip; (type YES)</div>
     <div class="swipe red"><div class="knob"><svg><use href="#i-chev"/></svg></div>Swipe to wipe<span class="arrows">&rsaquo;&rsaquo;&rsaquo;</span></div>
   </div>
   <div class="nav"><svg><use href="#i-back"/></svg><svg><use href="#i-home"/></svg><svg><use href="#i-log"/></svg></div>
 </div></div>
-<div class="cap">8 &middot; Wipe<span>clear wording, red swipe for anything destructive</span></div>
+<div class="cap">10 &middot; Wipe<span>"which one do I need?" answered on screen</span></div>
 </div>
 
-<!-- 9. Mount -->
+<!-- 11 Mount -->
 <div>
 <div class="frame"><div class="phone dark">
-  <div class="status"><span>21:52</span><span class="hole"></span><span class="r"><span class="muted">CPU 38&deg;C</span><span class="batt"><i></i>85%</span></span></div>
+  <div class="status"><span>9:52 PM</span><span class="hole"></span><span class="r"><span class="muted">CPU 38&deg;C</span><span class="batt"><i></i>85%</span></span></div>
   <div class="body">
-    <div class="title"><div class="back"><svg><use href="#i-back"/></svg></div><h2>Mount</h2></div>
+    <div class="title"><div class="back"><svg><use href="#i-back"/></svg></div><h2>Mount</h2><div class="help">?</div></div>
+    <p class="lead">A ticked partition is open, so its files can be read or changed. Untick to close it safely.</p>
     <div class="label">PARTITIONS &middot; SLOT B</div>
     <div class="list">
-      <div class="row"><div class="box on"><svg><use href="#i-check"/></svg></div><div class="t"><b>Data</b><span>f2fs &middot; encrypted &middot; 214 GB free</span></div></div>
-      <div class="row"><div class="box on"><svg><use href="#i-check"/></svg></div><div class="t"><b>Metadata</b><span>ext4</span></div></div>
-      <div class="row"><div class="box"></div><div class="t"><b>System</b><span>erofs &middot; read-only</span></div></div>
-      <div class="row"><div class="box"></div><div class="t"><b>Vendor</b><span>erofs &middot; read-only</span></div></div>
-      <div class="row"><div class="box"></div><div class="t"><b>Product / System_ext / ODM</b><span>erofs &middot; read-only</span></div></div>
-      <div class="row"><div class="box"></div><div class="t"><b>USB OTG</b><span>not connected</span></div></div>
+      <div class="row"><div class="box on"><svg><use href="#i-check"/></svg></div><div class="t"><b>Data</b><span>Your apps and files &middot; encrypted</span></div></div>
+      <div class="row"><div class="box on"><svg><use href="#i-check"/></svg></div><div class="t"><b>Metadata</b><span>Needed to unlock Data</span></div></div>
+      <div class="row"><div class="box"></div><div class="t"><b>System</b><span>Android itself &middot; read-only</span></div></div>
+      <div class="row"><div class="box"></div><div class="t"><b>Vendor</b><span>Hardware drivers &middot; read-only</span></div></div>
+      <div class="row"><div class="box"></div><div class="t"><b>USB OTG</b><span>Not connected</span></div></div>
     </div>
-    <div class="label" style="margin-top:12px">USB MODE</div>
-    <div class="seg"><div class="on">MTP</div><div>ADB only</div><div>Off</div></div>
+    <div class="label" style="margin-top:10px">USB MODE &mdash; WHAT THE PC SEES</div>
+    <div class="seg"><div class="on">MTP (files)</div><div>ADB only</div><div>Off</div></div>
     <div class="bottom">
       <div class="btn flex">Unmount all</div>
       <div class="btn primary">Done</div>
@@ -483,7 +603,131 @@ Rounded corners are drawn as images. Times and file names are sample data.</p>
   </div>
   <div class="nav"><svg><use href="#i-back"/></svg><svg><use href="#i-home"/></svg><svg><use href="#i-log"/></svg></div>
 </div></div>
-<div class="cap">9 &middot; Mount<span>tick to mount, USB mode switch</span></div>
+<div class="cap">11 &middot; Mount<span>each partition explained in plain words</span></div>
+</div>
+
+<!-- 12 Settings Arabic -->
+<div>
+<div class="frame"><div class="phone light rtl" dir="rtl">
+  <div class="status"><span>9:16 ص</span><span class="hole"></span><span class="r"><span class="muted">المعالج 34&deg;</span><span class="batt"><i></i>92%</span></span></div>
+  <div class="body">
+    <div class="title"><div class="back"><svg class="flip"><use href="#i-back"/></svg></div><h2>الإعدادات</h2><div class="help">؟</div></div>
+    <p class="lead">غيّر شكل وطريقة عمل ASEM Recovery. تُحفظ تلقائيًا وتبقى بعد إعادة التشغيل.</p>
+    <div class="list">
+      <div class="set">
+        <div class="h"><div class="si"><svg><use href="#i-globe"/></svg></div><div class="t"><b>اللغة</b><span>القوائم والتلميحات والمساعدة</span></div></div>
+        <div class="seg in" style="margin-left:0;margin-right:43px"><div>English</div><div class="on">العربية</div></div>
+      </div>
+      <div class="set">
+        <div class="h"><div class="si"><svg><use href="#i-clock"/></svg></div><div class="t"><b>تنسيق الساعة</b><span>المعروض الآن: 9:16 ص</span></div></div>
+        <div class="seg in" style="margin-left:0;margin-right:43px"><div class="on">12 ساعة</div><div>24 ساعة</div></div>
+      </div>
+      <div class="set">
+        <div class="h"><div class="si"><svg><use href="#i-palette"/></svg></div><div class="t"><b>المظهر</b><span>الداكن أريح للعين ليلًا</span></div></div>
+        <div class="seg in" style="margin-left:0;margin-right:43px"><div>داكن</div><div class="on">فاتح</div></div>
+      </div>
+      <div class="set">
+        <div class="h"><div class="si"><svg><use href="#i-vib"/></svg></div><div class="t"><b>اهتزاز عند اللمس</b><span>اهتزاز خفيف عند الضغط على زر</span></div><div class="toggle" style="transform:scaleX(-1)"></div></div>
+      </div>
+      <div class="set">
+        <div class="h"><div class="si"><svg><use href="#i-timer"/></svg></div><div class="t"><b>مهلة الشاشة</b><span>تعتيم الشاشة عند عدم اللمس</span></div><span class="val">60 ث</span></div>
+      </div>
+      <div class="set">
+        <div class="h"><div class="si"><svg><use href="#i-info"/></svg></div><div class="t"><b>حول</b><span>ASEM Recovery R1 &middot; مبني على TWRP</span></div></div>
+      </div>
+    </div>
+  </div>
+  <div class="nav"><svg class="flip"><use href="#i-back"/></svg><svg><use href="#i-home"/></svg><svg><use href="#i-log"/></svg></div>
+</div></div>
+<div class="cap">12 &middot; Settings &mdash; Arabic<span>same settings in Arabic, right-to-left</span></div>
+</div>
+
+<!-- 13 Reboot to sheet -->
+<div>
+<div class="frame"><div class="phone dark">
+  <div class="status"><span>9:55 PM</span><span class="hole"></span><span class="r"><span class="muted">CPU 37&deg;C</span><span class="batt"><i></i>84%</span></span></div>
+  <div class="body">
+    <div class="topbar">
+      <div class="brand"><img src="assets/asem_logo_96.png" width="36" height="36" alt=""><div><b>ASEM</b><small>RECOVERY</small></div></div>
+      <div class="tools"><div class="iconbtn"><svg><use href="#i-sun"/></svg></div><div class="iconbtn"><svg><use href="#i-gear"/></svg></div></div>
+    </div>
+    <div class="hero">
+      <div class="clock">9<em>:</em>55<small>PM</small></div>
+      <div class="date">Friday, 16 October 2026</div>
+    </div>
+  </div>
+  <div class="dim"></div>
+  <div class="sheet">
+    <div class="grab"></div>
+    <h3>Reboot to&hellip;</h3>
+    <p>Choose where the phone goes next. Active slot: <b>B</b>.</p>
+    <div class="ropt go"><div class="ic"><svg><use href="#i-reboot"/></svg></div><div class="t"><b>System</b><span>Start Android normally</span></div><svg class="chev"><use href="#i-chev"/></svg></div>
+    <div class="ropt"><div class="ic"><svg><use href="#i-restore"/></svg></div><div class="t"><b>Recovery</b><span>Restart ASEM Recovery</span></div><svg class="chev"><use href="#i-chev"/></svg></div>
+    <div class="ropt"><div class="ic"><svg><use href="#i-bootl"/></svg></div><div class="t"><b>Bootloader (fastboot)</b><span>PC rescue mode &mdash; flash boot images, works even if Android is broken</span></div><svg class="chev"><use href="#i-chev"/></svg></div>
+    <div class="ropt"><div class="ic"><svg><use href="#i-bolt"/></svg></div><div class="t"><b>Fastbootd</b><span>Flash a whole ROM (system, vendor&hellip;) from the PC</span></div><svg class="chev"><use href="#i-chev"/></svg></div>
+    <div class="ropt na"><div class="ic"><svg><use href="#i-lock"/></svg></div><div class="t"><b>BROM / download mode</b><span>Cannot be started by software. Power off, hold Vol Up + Vol Down, then plug in USB.</span></div></div>
+    <div class="ropt off"><div class="ic"><svg><use href="#i-power"/></svg></div><div class="t"><b>Power off</b><span style="color:inherit;opacity:.8">Turn the phone off completely</span></div><svg class="chev"><use href="#i-chev"/></svg></div>
+  </div>
+</div></div>
+<div class="cap">13 &middot; Reboot to&hellip; (from Home)<span>System in green, each target explained, BROM shown as how-to</span></div>
+</div>
+
+<!-- 14 Backup -->
+<div>
+<div class="frame"><div class="phone dark">
+  <div class="status"><span>9:58 PM</span><span class="hole"></span><span class="r"><span class="muted">CPU 37&deg;C</span><span class="batt"><i></i>84%</span></span></div>
+  <div class="body">
+    <div class="title"><div class="back"><svg><use href="#i-back"/></svg></div><h2>Backup</h2><div class="help">?</div></div>
+    <p class="lead">Saves partitions to files so you can undo changes later. Do this before flashing anything.</p>
+    <div class="label">WHAT TO SAVE</div>
+    <div class="list">
+      <div class="row sel"><div class="box on"><svg><use href="#i-check"/></svg></div><div class="t"><b>Boot</b><span>Kernel &middot; 64 MB &middot; before Magisk or a kernel</span></div></div>
+      <div class="row sel"><div class="box on"><svg><use href="#i-check"/></svg></div><div class="t"><b>Vendor Boot</b><span>Recovery + startup files &middot; 64 MB</span></div></div>
+      <div class="row sel"><div class="box on"><svg><use href="#i-check"/></svg></div><div class="t"><b>NVRAM + NVDATA</b><span>IMEI and network &middot; keep this safe!</span></div></div>
+      <div class="row"><div class="box"></div><div class="t"><b>Super</b><span>Whole system &middot; 12.8 GB &middot; slow</span></div></div>
+      <div class="row" style="opacity:.55"><div class="box"></div><div class="t"><b>Data</b><span>Apps and settings &middot; needs decryption</span></div></div>
+    </div>
+    <div class="label" style="margin-top:10px">SAVE TO</div>
+    <div class="storage">
+      <span class="chip ok"><span class="dot"></span>Internal &middot; 214 GB free</span>
+      <span class="chip">USB OTG</span>
+    </div>
+    <div class="card" style="margin-bottom:0"><p>Name: <b style="color:var(--text)">2026-10-16_SP15</b> &middot; selected 259 MB &middot; about 10 seconds</p></div>
+    <div class="swipe"><div class="knob"><svg><use href="#i-chev"/></svg></div>Swipe to back up<span class="arrows">&rsaquo;&rsaquo;&rsaquo;</span></div>
+  </div>
+  <div class="nav"><svg><use href="#i-back"/></svg><svg><use href="#i-home"/></svg><svg><use href="#i-log"/></svg></div>
+</div></div>
+<div class="cap">14 &middot; Backup<span>safe defaults ticked, sizes and time shown</span></div>
+</div>
+
+<!-- 15 Reboot to sheet Arabic -->
+<div>
+<div class="frame"><div class="phone light rtl" dir="rtl">
+  <div class="status"><span>9:30 ص</span><span class="hole"></span><span class="r"><span class="muted">المعالج 34&deg;</span><span class="batt"><i></i>90%</span></span></div>
+  <div class="body">
+    <div class="topbar">
+      <div class="brand"><img src="assets/asem_logo_96.png" width="36" height="36" alt=""><div><b>ASEM</b><small>RECOVERY</small></div></div>
+      <div class="tools"><div class="iconbtn"><svg><use href="#i-moon"/></svg></div><div class="iconbtn"><svg><use href="#i-gear"/></svg></div></div>
+    </div>
+    <div class="hero">
+      <div class="clock"><span dir="ltr">9<em>:</em>30</span><small>صباحًا</small></div>
+      <div class="date">الجمعة، 16 أكتوبر 2026</div>
+    </div>
+  </div>
+  <div class="dim"></div>
+  <div class="sheet">
+    <div class="grab"></div>
+    <h3>إعادة التشغيل إلى&hellip;</h3>
+    <p>اختر إلى أين يذهب الهاتف. الخانة النشطة: <b>B</b>.</p>
+    <div class="ropt go"><div class="ic"><svg><use href="#i-reboot"/></svg></div><div class="t"><b>النظام</b><span>تشغيل أندرويد بشكل طبيعي</span></div><svg class="chev flip"><use href="#i-chev"/></svg></div>
+    <div class="ropt"><div class="ic"><svg><use href="#i-restore"/></svg></div><div class="t"><b>الريكفري</b><span>إعادة تشغيل ASEM Recovery</span></div><svg class="chev flip"><use href="#i-chev"/></svg></div>
+    <div class="ropt"><div class="ic"><svg><use href="#i-bootl"/></svg></div><div class="t"><b>البوتلودر (فاستبوت)</b><span>وضع الإنقاذ عبر الكمبيوتر &mdash; يعمل حتى لو تعطل أندرويد</span></div><svg class="chev flip"><use href="#i-chev"/></svg></div>
+    <div class="ropt"><div class="ic"><svg><use href="#i-bolt"/></svg></div><div class="t"><b>فاستبوت دي</b><span>تفليش روم كامل من الكمبيوتر</span></div><svg class="chev flip"><use href="#i-chev"/></svg></div>
+    <div class="ropt na"><div class="ic"><svg><use href="#i-lock"/></svg></div><div class="t"><b>وضع BROM</b><span>لا يمكن تشغيله من البرنامج. أطفئ الهاتف، اضغط رفع + خفض الصوت، ثم وصّل USB.</span></div></div>
+    <div class="ropt off"><div class="ic"><svg><use href="#i-power"/></svg></div><div class="t"><b>إيقاف التشغيل</b><span style="color:inherit;opacity:.8">إطفاء الهاتف بالكامل</span></div><svg class="chev flip"><use href="#i-chev"/></svg></div>
+  </div>
+</div></div>
+<div class="cap">15 &middot; Reboot to&hellip; &mdash; Arabic<span>same chooser, right-to-left</span></div>
 </div>
 
 </div>
