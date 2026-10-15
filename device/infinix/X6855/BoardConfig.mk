@@ -111,7 +111,9 @@ TARGET_COPY_OUT_SYSTEM_DLKM := system_dlkm
 
 # Recovery fstab
 TARGET_RECOVERY_FSTAB := $(DEVICE_PATH)/recovery.fstab
-TARGET_RECOVERY_PIXEL_FORMAT := RGBX_8888
+# MTK panels usually need BGRA_8888 (also used by the OrangeFox X6855 tree).
+# If colours look swapped (blue/red), try RGBX_8888.
+TARGET_RECOVERY_PIXEL_FORMAT := BGRA_8888
 
 # Android 16 - version spoof so the Android 16 KeyMint (Trustonic) accepts the
 # android-14.1 recovery (same approach as working Android 16 MediaTek TWRP trees)

@@ -75,6 +75,19 @@ Enter recovery by hand: power off, hold Power + Volume Up.
 | USB OTG | |
 | Decryption (R3) | |
 
+## Known risks and plan B (from comparing with OrangeFox X6855, Andrikurn, fox_14.1)
+
+- **Slot switching:** that tree builds its own MediaTek boot-control HAL from
+  source (ufs-bsg + boot region control) instead of using the stock one, which
+  suggests the stock Android 16 HAL may not run under android-14.1. If the R1
+  test fails, port that approach (credit the author).
+- **Vibration / battery:** that tree patches TWRP for the LED-class vibrator
+  (`/sys/class/leds/vibrator`) and the health HAL. R2.
+- **USB:** that tree ships its own `init.recovery.usb.rc`. If ADB/MTP do not come
+  up with the stock `init.recovery.mt6789.rc`, add one.
+- **Decryption:** that tree carries the Trustonic TEE files (`mcRegistry`,
+  `init.tee.rc`) - reference for R3.
+
 ## Roadmap
 
 - R1 - plain TWRP base, all checklist items working.
