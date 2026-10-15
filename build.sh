@@ -24,7 +24,7 @@ cd "$WORK"
 if [ ! -d .repo ]; then
     repo init --depth=1 -u https://github.com/minimal-manifest-twrp/platform_manifest_twrp_aosp.git -b twrp-14.1
 fi
-repo sync -c --no-clone-bundle --no-tags --optimized-fetch --prune --force-sync -j"$(nproc)"
+repo sync -c --no-clone-bundle --no-tags --optimized-fetch --prune --force-sync -j"$(( $(nproc) * 4 ))"
 
 echo "== copying device tree"
 rm -rf device/infinix/X6855

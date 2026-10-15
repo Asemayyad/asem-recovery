@@ -1,0 +1,88 @@
+name: Build ASEM Recovery (X6855)
+
+on:
+  workflow_dispatch:
+    inputs:
+      decrypt:
+        description: "Build with decryption (R3, experimental)"
+        type: boolean
+        default: false
+  push:
+    branches: [main]
+    paths:
+      - "device/**"
+      - "tools/**"
+      - "build.sh"
+      - ".github/workflows/build.yml"
+
+concurrency:
+  group: asem-build
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 350
+    steps:
+      - name: Make room (one big build volume + swap)
+        uses: easimon/maximize-build-space@v10
+        with:
+          root-reserve-mb: 6144
+          swap-size-mb: 14336
+          remove-dotnet: "true"
+          remove-android: "true"
+          remove-haskell: "true"
+          remove-codeql: "true"
+          remove-docker-images: "true"
+
+      - name: Check out ASEM Recovery
+        uses: actions/checkout@v7
+        with:
+          path: asem
+
+      - name: Machine info
+        run: |
+          nproc; free -h; df -h "$GITHUB_WORKSPACE" /
+
+      - name: Install build tools
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq bc bison build-essential ccache curl flex g++-multilib \
+            gcc-multilib git git-lfs gnupg gperf lib32ncurses5-dev lib32z1-dev libelf-dev \
+            liblz4-tool libncurses5 libssl-dev libxml2-utils lzop python3 rsync \
+            schedtool squashfs-tools xsltproc zip zlib1g-dev
+          mkdir -p "$HOME/bin"
+          curl -sSL https://storage.googleapis.com/git-repo-downloads/repo -o "$HOME/bin/repo"
+          chmod +x "$HOME/bin/repo"
+          echo "$HOME/bin" >> "$GITHUB_PATH"
+          git config --global user.name "ASEM CI"
+          git config --global user.email "ci@asem.local"
+          git config --global color.ui false
+
+      - name: Build
+        shell: bash
+        env:
+          ASEM_DECRYPT: ${{ inputs.decrypt && 'true' || 'false' }}
+        run: |
+          cd asem
+          bash build.sh "$GITHUB_WORKSPACE/twrp" 2>&1 | tee "$GITHUB_WORKSPACE/build.log"
+
+      - name: Upload recovery image
+        if: success()
+        uses: actions/upload-artifact@v7
+        with:
+          name: ASEM_Recovery_X6855
+          path: asem/out/*
+          retention-days: 14
+
+      - name: Upload build log
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: build-log
+          path: |
+            ${{ github.workspace }}/build.log
+            ${{ github.workspace }}/twrp/out/error.log
+            ${{ github.workspace }}/twrp/out/soong.log
+          if-no-files-found: ignore
+          retention-days: 14
