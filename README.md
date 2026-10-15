@@ -103,8 +103,19 @@ Enter recovery by hand: power off, hold Power + Volume Up.
     Shown as instructions only (greyed out, lock icon, no button action):
     - Recovery: power off, hold Power + Volume Up until the logo appears.
       Software "reboot recovery" stays disabled until tested safely.
-    - BROM: cannot be entered from software on MediaTek (power off, hold
-      Vol Up + Vol Down, plug in USB).
+    - BROM / EDL: one card for both chip families; its text and behaviour come
+      from the device config. MediaTek (this phone): BROM cannot be entered from
+      software - power off, hold Vol Up + Vol Down, plug in USB. Qualcomm
+      (future): EDL - a real "reboot edl" button only on devices that allow it,
+      otherwise instructions (key combo / test point).
+
+## Long-term goal: universal ASEM Recovery
+
+ASEM Recovery is meant to become universal (other MediaTek phones, later
+Snapdragon). Rule for all work: keep the ASEM theme, texts, translations and
+features device-independent; put everything phone-specific (partitions, offsets,
+backlight path, slot HAL, BROM-vs-EDL card, which reboot targets are allowed)
+in the device tree / a per-device config. X6855 is the first device.
   - Arabic: TWRP's text renderer does not join Arabic letters or do right-to-left
     by itself. Plan: ship a font with Arabic (e.g. Noto Sans Arabic) and convert
     the Arabic language file to pre-joined letter forms in visual order with a
