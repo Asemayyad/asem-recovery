@@ -9,6 +9,10 @@ on:
         default: false
 # Manual only (Actions tab > Run workflow): pushes never spend build minutes.
 
+permissions:
+  contents: read
+  actions: write   # needed to delete older build artifacts
+
 concurrency:
   group: asem-build
   cancel-in-progress: true
@@ -67,7 +71,19 @@ jobs:
         with:
           name: ASEM_Recovery_X6855
           path: asem/out/*
-          retention-days: 14
+          retention-days: 5
+
+      - name: Delete older build artifacts (keep storage free)
+        if: success()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          api="https://api.github.com/repos/${{ github.repository }}"
+          curl -s -H "Authorization: Bearer $GH_TOKEN" "$api/actions/artifacts?per_page=100" \
+            | python3 -c "import json,sys; [print(a['id']) for a in json.load(sys.stdin)['artifacts'] if a['workflow_run']['id'] != ${{ github.run_id }}]" \
+            | while read -r id; do
+                curl -s -X DELETE -H "Authorization: Bearer $GH_TOKEN" "$api/actions/artifacts/$id" && echo "deleted old artifact $id"
+              done
 
       - name: Upload build log
         if: always()
@@ -79,4 +95,4 @@ jobs:
             ${{ github.workspace }}/twrp/out/error.log
             ${{ github.workspace }}/twrp/out/soong.log
           if-no-files-found: ignore
-          retention-days: 14
+          retention-days: 5
