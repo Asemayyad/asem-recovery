@@ -48,25 +48,41 @@ SMALL=$(printf '%s\n' $ALL | grep -vxF -f <(printf '%s\n' $BIG))
 echo "   stage 1: $(echo "$SMALL" | wc -l) small projects"
 $SYNC $SMALL
 drop_git_objects; disk
+# Trim a just-synced prebuilt down to what a Linux build uses (sizes measured on a
+# runner: clang 13 GB with 6 versions, rust 17 GB with 3 versions x 4 host OSes).
+trim() {
+    local p=$1 d v keep
+    find "$p" -mindepth 1 -maxdepth 2 -type d \( -name 'darwin-*' -o -name 'windows-*' \) -prune -exec rm -rf {} +
+    case $p in
+    prebuilts/clang/host/linux-x86)
+        keep=$(grep -rhoE 'clang-r[0-9]+[a-z]?' build/soong build/make 2>/dev/null | sort -u)
+        echo "   clang versions named by the build: $(echo $keep)"
+        for d in "$p"/clang-r*; do
+            [ -d "$d" ] && [ ! -L "$d" ] || continue
+            v=$(basename "$d")
+            echo "$keep" | grep -qxF "$v" && continue
+            readlink "$p"/* 2>/dev/null | grep -q "$v" && continue
+            echo "   removing unused $v"; rm -rf "$d"
+        done ;;
+    prebuilts/rust)
+        keep=$(sed -n 's/^\s*RustDefaultVersion\s*=\s*"\([^"]*\)".*/\1/p' build/soong/rust/config/global.go)
+        echo "   rust version used by the build: $keep"
+        [ -n "$keep" ] && [ -d "$p/linux-x86/$keep" ] || { echo "   (not found - rust left as is)"; return; }
+        rm -rf "$p/linux-musl-x86"
+        for d in "$p"/linux-x86/*; do
+            v=$(basename "$d")
+            [ "$v" = "$keep" ] || [ "$v" = stable ] || { echo "   removing unused rust $v"; rm -rf "$d"; }
+        done ;;
+    esac
+}
 for p in $BIG; do
     printf '%s\n' $ALL | grep -qxF "$p" || continue
     echo "   stage 2: $p"
     $SYNC "$p"
     drop_git_objects
+    trim "$p"
     echo "   $(du -sh "$p" | cut -f1)  $p"; disk
 done
-# keep only the clang versions the build files name (prebuilts/clang has many)
-CL=prebuilts/clang/host/linux-x86
-KEEP=$(grep -rhoE 'clang-r[0-9]+[a-z]?' build/soong build/make prebuilts/rust 2>/dev/null | sort -u)
-echo "   clang versions referenced: $(echo $KEEP)"
-for d in "$CL"/clang-r*; do
-    [ -d "$d" ] && [ ! -L "$d" ] || continue
-    v=$(basename "$d")
-    echo "$KEEP" | grep -qxF "$v" && continue
-    readlink "$CL"/* 2>/dev/null | grep -q "$v" && continue
-    echo "   removing unused $v ($(du -sh "$d" | cut -f1))"; rm -rf "$d"
-done
-disk
 
 echo "== applying the ASEM theme (validated before compiling)"
 git -C bootable/recovery checkout -q -- .

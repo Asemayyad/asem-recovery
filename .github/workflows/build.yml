@@ -58,9 +58,9 @@ jobs:
           fi
           sudo mkdir -p "$build"; sudo chown "$(id -u):$(id -g)" "$build"
           echo "BUILD_DIR=$build" >> "$GITHUB_ENV"
-          # 8 GB swap: on the other disk if it has room, else on the build disk
-          if [ "$other_free" -gt 12000 ]; then swap=${other%/}/asem.swap; else swap=$build.swap; build_free=$((build_free - 8192)); fi
-          sudo fallocate -l 8G "$swap" && sudo chmod 600 "$swap" && sudo mkswap "$swap" >/dev/null && sudo swapon "$swap"
+          # 6 GB swap: on the other disk if it has room, else on the build disk
+          if [ "$other_free" -gt 12000 ]; then swap=${other%/}/asem.swap; else swap=$build.swap; build_free=$((build_free - 6144)); fi
+          sudo fallocate -l 6G "$swap" && sudo chmod 600 "$swap" && sudo mkswap "$swap" >/dev/null && sudo swapon "$swap"
           echo "== after"; df -h; free -h; echo "build dir: $build (${build_free} MB usable)"
           if [ "$build_free" -lt 30000 ]; then
             echo "::error::Only ${build_free} MB free for the build (needs ~30 GB) - stopping now to save minutes."
