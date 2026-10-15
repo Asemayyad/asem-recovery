@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Projects the twrp-14.1 minimal manifest still syncs but a recovery build never
+     uses: Mac tools, emulator/GKI test kernels, older VNDK snapshots, ABI reference
+     dumps. Saves several GB on a GitHub runner. -->
+<manifest>
+    <remove-project path="prebuilts/bazel/darwin-x86_64" />
+    <remove-project path="kernel/prebuilts/6.6/arm64" />
+    <remove-project path="kernel/prebuilts/6.6/x86_64" />
+    <remove-project path="kernel/prebuilts/common-modules/virtual-device/5.15/arm64" />
+    <remove-project path="kernel/prebuilts/common-modules/virtual-device/5.15/x86-64" />
+    <remove-project path="kernel/prebuilts/common-modules/virtual-device/6.6/arm64" />
+    <remove-project path="kernel/prebuilts/common-modules/virtual-device/6.6/x86-64" />
+    <remove-project path="prebuilts/vndk/v29" />
+    <remove-project path="prebuilts/vndk/v30" />
+    <remove-project path="prebuilts/vndk/v31" />
+    <remove-project path="prebuilts/vndk/v32" />
+    <remove-project path="prebuilts/vndk/v33" />
+    <remove-project path="prebuilts/abi-dumps/ndk" />
+    <remove-project path="prebuilts/abi-dumps/platform" />
+    <remove-project path="prebuilts/abi-dumps/vndk" />
+</manifest>

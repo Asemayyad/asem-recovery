@@ -24,7 +24,49 @@ cd "$WORK"
 if [ ! -d .repo ]; then
     repo init --depth=1 -u https://github.com/minimal-manifest-twrp/platform_manifest_twrp_aosp.git -b twrp-14.1
 fi
-repo sync -c --no-clone-bundle --no-tags --optimized-fetch --prune --force-sync -j"$(( $(nproc) * 4 ))"
+# Even the "minimal" twrp-14.1 tree is >45 GB with git objects + checkout, more than
+# a free GitHub runner has. So: skip projects a recovery never uses, and sync in
+# stages, deleting each stage's git objects right after checkout (the build does not
+# need git history; bootable/recovery and vendor/twrp keep theirs).
+mkdir -p .repo/local_manifests
+cp "$HERE/device/asem-slim.xml" .repo/local_manifests/asem-slim.xml
+SYNC="repo sync -c --no-clone-bundle --no-tags --optimized-fetch --prune --force-sync -j$(( $(nproc) * 4 ))"
+BIG="prebuilts/clang/host/linux-x86 prebuilts/rust prebuilts/sdk prebuilts/tools prebuilts/gradle-plugin
+     prebuilts/misc prebuilts/build-tools prebuilts/go/linux-x86 prebuilts/bazel/linux-x86_64
+     prebuilts/jdk/jdk8 prebuilts/jdk/jdk11 prebuilts/jdk/jdk17 prebuilts/jdk/jdk21 prebuilts/vndk/v34
+     prebuilts/clang-tools external/cronet external/skia external/llvm packages/modules/Bluetooth
+     kernel/prebuilts/5.15/arm64 kernel/prebuilts/5.15/x86_64"
+drop_git_objects() {
+    find .repo/project-objects .repo/projects -mindepth 1 -maxdepth 8 -type d -name '*.git' -prune \
+        ! -name 'android_bootable_recovery.git' ! -name 'android_vendor_twrp.git' \
+        ! -path '*/bootable/recovery.git' ! -path '*/vendor/twrp.git' \
+        -exec rm -rf {} + 2>/dev/null || true
+}
+disk() { echo "   [disk] $(df -h --output=used,avail . | tail -1 | awk '{print $1" used, "$2" free"}')"; }
+ALL=$(repo list -a -p)
+SMALL=$(printf '%s\n' $ALL | grep -vxF -f <(printf '%s\n' $BIG))
+echo "   stage 1: $(echo "$SMALL" | wc -l) small projects"
+$SYNC $SMALL
+drop_git_objects; disk
+for p in $BIG; do
+    printf '%s\n' $ALL | grep -qxF "$p" || continue
+    echo "   stage 2: $p"
+    $SYNC "$p"
+    drop_git_objects
+    echo "   $(du -sh "$p" | cut -f1)  $p"; disk
+done
+# keep only the clang versions the build files name (prebuilts/clang has many)
+CL=prebuilts/clang/host/linux-x86
+KEEP=$(grep -rhoE 'clang-r[0-9]+[a-z]?' build/soong build/make prebuilts/rust 2>/dev/null | sort -u)
+echo "   clang versions referenced: $(echo $KEEP)"
+for d in "$CL"/clang-r*; do
+    [ -d "$d" ] && [ ! -L "$d" ] || continue
+    v=$(basename "$d")
+    echo "$KEEP" | grep -qxF "$v" && continue
+    readlink "$CL"/* 2>/dev/null | grep -q "$v" && continue
+    echo "   removing unused $v ($(du -sh "$d" | cut -f1))"; rm -rf "$d"
+done
+disk
 
 echo "== applying the ASEM theme (validated before compiling)"
 git -C bootable/recovery checkout -q -- .

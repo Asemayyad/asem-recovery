@@ -58,9 +58,9 @@ jobs:
           fi
           sudo mkdir -p "$build"; sudo chown "$(id -u):$(id -g)" "$build"
           echo "BUILD_DIR=$build" >> "$GITHUB_ENV"
-          # 10 GB swap: on the other disk if it has room, else on the build disk
-          if [ "$other_free" -gt 12000 ]; then swap=${other%/}/asem.swap; else swap=$build.swap; build_free=$((build_free - 10240)); fi
-          sudo fallocate -l 10G "$swap" && sudo chmod 600 "$swap" && sudo mkswap "$swap" >/dev/null && sudo swapon "$swap"
+          # 8 GB swap: on the other disk if it has room, else on the build disk
+          if [ "$other_free" -gt 12000 ]; then swap=${other%/}/asem.swap; else swap=$build.swap; build_free=$((build_free - 8192)); fi
+          sudo fallocate -l 8G "$swap" && sudo chmod 600 "$swap" && sudo mkswap "$swap" >/dev/null && sudo swapon "$swap"
           echo "== after"; df -h; free -h; echo "build dir: $build (${build_free} MB usable)"
           if [ "$build_free" -lt 30000 ]; then
             echo "::error::Only ${build_free} MB free for the build (needs ~30 GB) - stopping now to save minutes."
@@ -96,13 +96,13 @@ jobs:
           # runner survives and the log gets uploaded
           n=0
           while kill -0 $bpid 2>/dev/null; do
-            sleep 30; n=$((n + 1))
+            sleep 10; n=$((n + 1))
             b=$(df -m --output=avail "$BUILD_DIR" | tail -1); r=$(df -m --output=avail / | tail -1)
-            if [ "$b" -lt 1500 ] || [ "$r" -lt 800 ]; then
+            if [ "$b" -lt 3000 ] || [ "$r" -lt 1500 ]; then
               echo "::error::Disk almost full (build dir ${b} MB, root ${r} MB) - stopping the build so the log is saved"
               df -h; kill -TERM -- -$bpid || true; sleep 15; kill -KILL -- -$bpid 2>/dev/null || true; break
             fi
-            [ $((n % 10)) -eq 0 ] && echo "[watch] build dir ${b} MB free, root ${r} MB free, RAM avail $(free -m | awk '/Mem:/{print $7}') MB"
+            [ $((n % 30)) -eq 0 ] && echo "[watch] build dir ${b} MB free, root ${r} MB free, RAM avail $(free -m | awk '/Mem:/{print $7}') MB"
           done
           wait $bpid; rc=$?
           sleep 2
