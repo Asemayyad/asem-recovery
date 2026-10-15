@@ -73,7 +73,7 @@ Enter recovery by hand: power off, hold Power + Volume Up.
 | Wipe cache / dalvik / data | |
 | Backup boot / vendor_boot / nvram | |
 | Reboot to: System / Bootloader / Fastbootd / Power off | |
-| Reboot to: Recovery (test with care - the Rescue Toolbox avoids software "reboot recovery" on this phone; enter recovery by hand if it misbehaves) | |
+| Reboot to: Recovery - DISABLED in the UI (shown as instructions: power off, hold Power + Volume Up). The Rescue Toolbox avoids software "reboot recovery" on this phone; only re-enable after a controlled test with backups ready. | |
 | USB OTG | |
 | Decryption (R3) | |
 
@@ -99,9 +99,12 @@ Enter recovery by hand: power off, hold Power + Volume Up.
     one-line description and a "?" help sheet.
   - Settings: language English / Arabic, clock 12-hour (default) / 24-hour
     (TWRP built-in `tw_military_time`), theme, brightness, vibration, timeout.
-  - Home "Reboot to..." chooser: System (green), Recovery, Bootloader, Fastbootd,
-    Power off. BROM is shown as instructions only - MediaTek BROM cannot be
-    entered from software (power off, hold Vol Up + Vol Down, plug in USB).
+  - Home "Reboot to..." chooser: System (green), Bootloader, Fastbootd, Power off.
+    Shown as instructions only (greyed out, lock icon, no button action):
+    - Recovery: power off, hold Power + Volume Up until the logo appears.
+      Software "reboot recovery" stays disabled until tested safely.
+    - BROM: cannot be entered from software on MediaTek (power off, hold
+      Vol Up + Vol Down, plug in USB).
   - Arabic: TWRP's text renderer does not join Arabic letters or do right-to-left
     by itself. Plan: ship a font with Arabic (e.g. Noto Sans Arabic) and convert
     the Arabic language file to pre-joined letter forms in visual order with a
