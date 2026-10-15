@@ -7,13 +7,7 @@ on:
         description: "Build with decryption (R3, experimental)"
         type: boolean
         default: false
-  push:
-    branches: [main]
-    paths:
-      - "device/**"
-      - "tools/**"
-      - "build.sh"
-      - ".github/workflows/build.yml"
+# Manual only (Actions tab > Run workflow): pushes never spend build minutes.
 
 concurrency:
   group: asem-build
