@@ -108,6 +108,16 @@ TARGET_COPY_OUT_ODM := odm
 TARGET_COPY_OUT_VENDOR_DLKM := vendor_dlkm
 TARGET_COPY_OUT_ODM_DLKM := odm_dlkm
 TARGET_COPY_OUT_SYSTEM_DLKM := system_dlkm
+# Android 14 requires a filesystem type for every partition named above. Only
+# vendor_boot is built here, so these just satisfy the config check (stock is erofs).
+BOARD_SYSTEMIMAGE_FILE_SYSTEM_TYPE := ext4
+BOARD_SYSTEM_EXTIMAGE_FILE_SYSTEM_TYPE := ext4
+BOARD_PRODUCTIMAGE_FILE_SYSTEM_TYPE := ext4
+BOARD_VENDORIMAGE_FILE_SYSTEM_TYPE := ext4
+BOARD_ODMIMAGE_FILE_SYSTEM_TYPE := ext4
+BOARD_VENDOR_DLKMIMAGE_FILE_SYSTEM_TYPE := ext4
+BOARD_ODM_DLKMIMAGE_FILE_SYSTEM_TYPE := ext4
+BOARD_SYSTEM_DLKMIMAGE_FILE_SYSTEM_TYPE := ext4
 
 # Recovery fstab
 TARGET_RECOVERY_FSTAB := $(DEVICE_PATH)/recovery.fstab
