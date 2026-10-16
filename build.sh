@@ -52,7 +52,12 @@ drop_git_objects; disk
 # runner: clang 13 GB with 6 versions, rust 17 GB with 3 versions x 4 host OSes).
 trim() {
     local p=$1 d v keep
-    find "$p" -mindepth 1 -maxdepth 2 -type d \( -name 'darwin-*' -o -name 'windows-*' \) -prune -exec rm -rf {} +
+    case $p in
+    # Mac/Windows copies: only where no Android.bp names files inside them
+    # (prebuilts/misc's license module does - removing its darwin dirs breaks soong)
+    prebuilts/rust|prebuilts/jdk/*)
+        find "$p" -mindepth 1 -maxdepth 2 -type d \( -name 'darwin-*' -o -name 'windows-*' \) -prune -exec rm -rf {} + ;;
+    esac
     case $p in
     prebuilts/clang/host/linux-x86)
         keep=$(grep -rhoE 'clang-r[0-9]+[a-z]?' build/soong build/make 2>/dev/null | sort -u)
