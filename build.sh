@@ -17,6 +17,15 @@ VERSION=$(sed -n 's/^TW_DEVICE_VERSION := //p' "$HERE/device/infinix/X6855/Board
 
 echo "== checking stock vendor_boot"
 (cd "$HERE/stock" && sha256sum -c SHA256SUMS.txt)
+# Self-test the packing tool with this machine's Python now, not after a 2-hour build:
+# stock recovery fragment -> repack -> must equal the stock image data byte for byte.
+echo "== self-test: packing tool round trip on stock"
+T=$(mktemp -d)
+python3 "$HERE/tools/asem_vendor_boot.py" info "$STOCK"
+python3 "$HERE/tools/asem_vendor_boot.py" extract "$STOCK" recovery "$T/rec.cpio"
+python3 "$HERE/tools/asem_vendor_boot.py" replace "$STOCK" "$T/rec.cpio" "$T/rt.img"
+cmp -n "$(stat -c %s "$T/rt.img")" "$T/rt.img" "$STOCK" && echo "   round trip byte-identical"
+rm -rf "$T"
 
 echo "== syncing TWRP android-14.1 into $WORK"
 mkdir -p "$WORK"
@@ -127,6 +136,8 @@ set -u
 
 echo "== packing ASEM Recovery into stock vendor_boot"
 mkdir -p "$HERE/out"
+# keep the raw TWRP build too, so a packing problem never loses a finished build
+cp out/target/product/X6855/vendor_boot.img "$HERE/out/twrp_built_vendor_boot.img"
 IMG="$HERE/out/ASEM_Recovery_X6855_${VERSION}.img"
 python3 "$HERE/tools/asem_vendor_boot.py" replace "$STOCK" out/target/product/X6855/vendor_boot.img "$IMG"
 python3 "$HERE/tools/asem_vendor_boot.py" info "$IMG"

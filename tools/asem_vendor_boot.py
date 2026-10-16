@@ -85,8 +85,9 @@ def main(argv):
     cmd = argv[1]
     if cmd == "info" and len(argv) == 3:
         hdr, entries, dtb, bc, end = parse(open(argv[2], "rb").read())
+        cmdline = hdr['cmdline'].split(b'\0', 1)[0].decode()  # no backslash inside f-strings (Python 3.10 on the runner)
         print(f"header v{hdr['version']} page {hdr['page']} cmdline "
-              f"'{hdr['cmdline'].split(b'\0', 1)[0].decode()}' dtb {len(dtb)} bytes, image data ends at {end}")
+              f"'{cmdline}' dtb {len(dtb)} bytes, image data ends at {end}")
         for e in entries:
             print(f"  ramdisk '{e['name']}' type {TYPES.get(e['type'], e['type'])} {len(e['data'])} bytes")
         print("  bootconfig: " + bc.decode(errors="replace").replace("\n", " | "))

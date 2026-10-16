@@ -120,11 +120,12 @@ jobs:
           exit $rc
 
       - name: Upload recovery image
-        if: success()
+        if: always()   # also after a failed packing step: keeps the raw TWRP vendor_boot
         uses: actions/upload-artifact@v7
         with:
           name: ASEM_Recovery_X6855
           path: asem/out/*
+          if-no-files-found: ignore
           retention-days: 5
 
       - name: Delete older build artifacts (keep storage free)
