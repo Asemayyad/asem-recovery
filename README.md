@@ -132,6 +132,20 @@ Power + Volume Up), not with `adb reboot recovery`, until it is proven to start.
       (future): EDL - a real "reboot edl" button only on devices that allow it,
       otherwise instructions (key combo / test point).
 
+## Before sharing with other X6855 users (firmware-independent install)
+
+Today's image = the SP15 stock vendor_boot + the ASEM recovery fragment. Safe on SP15
+phones. On other firmware versions the SP15 platform ramdisk (kernel modules) could
+mismatch their kernel. Plan:
+- **ASEM installer** (zip / on-device script): read the user's OWN vendor_boot, swap
+  only the "recovery" fragment (asem_vendor_boot.py logic), write it back - like
+  Magisk patches boot. Never ship a whole vendor_boot to other firmware versions.
+- **Touch**: load focaltech + adaptive-ts from the user's OWN odm_dlkm (mounted ro)
+  instead of SP15 copies; apply the boot-mode patch by byte PATTERN, not offset;
+  detect the touch chip (other units may use a different one).
+- Decryption already uses each phone's own vendor partition (matches any firmware).
+- ASEM Stock Restore stays per-firmware (it refuses any other layout).
+
 ## Long-term goal: universal ASEM Recovery
 
 ASEM Recovery is meant to become universal (other MediaTek phones, later
