@@ -103,6 +103,13 @@ echo "== applying the ASEM theme (validated before compiling)"
 git -C bootable/recovery checkout -q -- .
 git -C bootable/recovery clean -fdq
 python3 "$HERE/theme/apply_theme.py" --check "$WORK"
+# TWRP 14.1 bug: twrp_ramdisk copies system/etc/task_profiles.json but requires it only
+# with TW_INCLUDE_CRYPTO, so without crypto the copy can run before the file exists.
+# Required modules are built first (main.mk add-required-deps), so add it there.
+sed -i 's/^LOCAL_REQUIRED_MODULES += init_second_stage\.recovery /LOCAL_REQUIRED_MODULES += task_profiles.json init_second_stage.recovery /' \
+    bootable/recovery/prebuilt/Android.mk
+grep -q '^LOCAL_REQUIRED_MODULES += task_profiles.json init_second_stage.recovery' bootable/recovery/prebuilt/Android.mk \
+    || { echo "!! task_profiles.json patch did not apply"; exit 1; }
 
 echo "== copying device tree"
 rm -rf device/infinix/X6855
@@ -115,9 +122,6 @@ export ASEM_DECRYPT=${ASEM_DECRYPT:-false}
 set +u
 source build/envsetup.sh
 lunch twrp_X6855-ap2a-eng
-# TWRP 14.1's twrp_ramdisk step copies system/etc/task_profiles.json, but only lists
-# it as a dependency when crypto is on (TW_INCLUDE_CRYPTO) - so build it first.
-mka task_profiles.json
 mka vendorbootimage
 set -u
 
