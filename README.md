@@ -76,6 +76,11 @@ Enter recovery by hand: power off, hold Power + Volume Up.
 
 ## R1 test checklist (fill in on the phone)
 
+**Test safety rules (so no data is lost):** while testing, do NOT use "Mount system as
+read/write" (erofs cannot be written; may show errors), do NOT Format Data, do NOT wipe
+anything. Mounting / unmounting partitions is safe. Enter a new build by hand (power off,
+Power + Volume Up), not with `adb reboot recovery`, until it is proven to start.
+
 | Feature | Result |
 |---|---|
 | Boots to ASEM Recovery | |
