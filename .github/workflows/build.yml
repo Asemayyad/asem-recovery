@@ -58,11 +58,20 @@ jobs:
           fi
           sudo mkdir -p "$build"; sudo chown "$(id -u):$(id -g)" "$build"
           echo "BUILD_DIR=$build" >> "$GITHUB_ENV"
-          # 6 GB swap: on the other disk if it has room, else on the build disk
-          if [ "$other_free" -gt 12000 ]; then swap=${other%/}/asem.swap; else swap=$build.swap; build_free=$((build_free - 6144)); fi
-          sudo fallocate -l 6G "$swap" && sudo chmod 600 "$swap" && sudo mkswap "$swap" >/dev/null && sudo swapon "$swap"
+          # Memory: this runner has 7.8 GB RAM; Android 14's build analysis needs ~14+ GB.
+          # 12 GB disk swap + compressed RAM swap (zram, if the kernel has it).
+          if [ "$other_free" -gt 14000 ]; then swap=${other%/}/asem.swap; else swap=$build.swap; build_free=$((build_free - 12288)); fi
+          sudo fallocate -l 12G "$swap" && sudo chmod 600 "$swap" && sudo mkswap "$swap" >/dev/null && sudo swapon -p 10 "$swap"
+          if sudo modprobe zram 2>/dev/null && [ -e /sys/block/zram0 ]; then
+            echo lz4 | sudo tee /sys/block/zram0/comp_algorithm >/dev/null 2>&1 || true
+            echo 6G | sudo tee /sys/block/zram0/disksize >/dev/null && sudo mkswap /dev/zram0 >/dev/null && sudo swapon -p 100 /dev/zram0 && echo "zram: 6 GB"
+          else
+            echo "zram: not available on this kernel"
+          fi
+          sudo sysctl -q vm.swappiness=100 || true
+          swapon --show
           echo "== after"; df -h; free -h; echo "build dir: $build (${build_free} MB usable)"
-          if [ "$build_free" -lt 30000 ]; then
+          if [ "$build_free" -lt 36000 ]; then
             echo "::error::Only ${build_free} MB free for the build (needs ~30 GB) - stopping now to save minutes."
             exit 1
           fi
@@ -88,6 +97,8 @@ jobs:
           ASEM_DECRYPT: ${{ inputs.decrypt && 'true' || 'false' }}
         run: |
           cd asem
+          # if memory runs out, let the kernel kill the build, not the GitHub runner
+          for pid in $(pgrep -f 'Runner\.(Listener|Worker)'); do echo -1000 | sudo tee /proc/$pid/oom_score_adj >/dev/null; done
           log="$GITHUB_WORKSPACE/build.log"
           setsid bash build.sh "$BUILD_DIR/twrp" > "$log" 2>&1 &
           bpid=$!
@@ -102,7 +113,7 @@ jobs:
               echo "::error::Disk almost full (build dir ${b} MB, root ${r} MB) - stopping the build so the log is saved"
               df -h; kill -TERM -- -$bpid || true; sleep 15; kill -KILL -- -$bpid 2>/dev/null || true; break
             fi
-            [ $((n % 30)) -eq 0 ] && echo "[watch] build dir ${b} MB free, root ${r} MB free, RAM avail $(free -m | awk '/Mem:/{print $7}') MB"
+            [ $((n % 30)) -eq 0 ] && echo "[watch] build dir ${b} MB free, root ${r} MB free, RAM avail $(free -m | awk '/Mem:/{print $7}') MB, swap used $(free -m | awk '/Swap:/{print $3}') MB"
           done
           wait $bpid; rc=$?
           sleep 2
