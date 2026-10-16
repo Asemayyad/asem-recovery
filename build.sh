@@ -112,6 +112,9 @@ echo "== applying the ASEM theme (validated before compiling)"
 git -C bootable/recovery checkout -q -- .
 git -C bootable/recovery clean -fdq
 python3 "$HERE/theme/apply_theme.py" --check "$WORK"
+# smooth sliders (partial redraw) + render timing log - see tools/patch_twrp_gui.py
+python3 "$HERE/tools/patch_twrp_gui.py" "$WORK"
+grep -q "// ASEM: partial slider redraw" bootable/recovery/gui/slider.cpp     || { echo "!! slider patch did not apply"; exit 1; }
 # TWRP 14.1 bug: twrp_ramdisk copies system/etc/task_profiles.json but requires it only
 # with TW_INCLUDE_CRYPTO, so without crypto the copy can run before the file exists.
 # Required modules are built first (main.mk add-required-deps), so add it there.

@@ -146,7 +146,7 @@ BOARD_USES_METADATA_PARTITION := true
 endif
 
 # ---------------- TWRP / ASEM ----------------
-TW_DEVICE_VERSION := ASEM_R1
+TW_DEVICE_VERSION := ASEM_R2
 TW_THEME := portrait_hdpi
 TW_FRAMERATE := 60
 TW_DEFAULT_LANGUAGE := en

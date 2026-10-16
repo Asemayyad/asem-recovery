@@ -1,32 +1,38 @@
 # ASEM Recovery - USB (configfs) for MTK musb-hdrc, replaces TWRP's legacy
 # android_usb-only init.recovery.usb.rc (TW_EXCLUDE_DEFAULT_USB_INIT := true).
 # TWRP's init.rc already creates the gadget, ffs.adb / ffs.fastboot and the adb,
-# sideload and fastboot configs. Missing on configfs devices: MTP. Without it, TWRP's
-# switch to "mtp,adb" tore USB down and ADB was lost (R1).
-# Rule: ADB comes up on its own first; MTP is added only when TWRP's MTP server has
-# written its descriptors (it sets sys.usb.ffs.mtp.ready=1), so ADB never waits on MTP.
+# sideload and fastboot configs, and handles "none". Missing on configfs: MTP.
+#
+# R2 (#14) lesson: an "ADB-only" rule and an "MTP+ADB" rule that BOTH unbind and rebind
+# the UDC on every sys.usb.ffs.ready=1 loop forever: each rebind makes adbd reconnect,
+# adbd sets ffs.ready=1 again, both rules fire again (kernel log: every ~25 ms) and USB
+# never settles. Rules now:
+#   A  ADB-only bind  - only while MTP is NOT ready, never unbinds
+#   B  MTP+ADB bind   - fires once when MTP becomes ready (not on adbd reconnects)
+#   C  bind-if-unbound - MTP ready before adbd: just write the UDC, never unbinds
+# TWRP's MTP server sets sys.usb.ffs.mtp.ready=1 after writing its descriptors, and
+# Disable_MTP sets it back to 0 (then "none" -> "adb", handled by TWRP's init.rc).
 
 on fs && property:sys.usb.configfs=1
     mkdir /config/usb_gadget/g1/functions/ffs.mtp
     mkdir /dev/usb-ffs/mtp 0770 mtp mtp
     mount functionfs mtp /dev/usb-ffs/mtp rmode=0770,fmode=0660,uid=1024,gid=1024,no_disconnect=1
+    setprop sys.usb.ffs.mtp.ready 0
 
 on property:sys.usb.config=mtp,adb && property:sys.usb.configfs=1
     start adbd
 
-# step 1: ADB only
-on property:sys.usb.config=mtp,adb && property:sys.usb.ffs.ready=1 && property:sys.usb.configfs=1
-    write /config/usb_gadget/g1/UDC "none"
-    rm /config/usb_gadget/g1/configs/b.1/f1
-    rm /config/usb_gadget/g1/configs/b.1/f2
+# A: ADB on its own while MTP is not ready (no UDC "none": a failed symlink/UDC write
+#    on a repeat trigger is harmless; "none" handling already cleared f1/f2)
+on property:sys.usb.config=mtp,adb && property:sys.usb.ffs.ready=1 && property:sys.usb.ffs.mtp.ready=0 && property:sys.usb.configfs=1
     write /config/usb_gadget/g1/idProduct 0x${ro.recovery.usb.adb.pid}
     write /config/usb_gadget/g1/configs/b.1/strings/0x409/configuration "adb"
     symlink /config/usb_gadget/g1/functions/ffs.adb /config/usb_gadget/g1/configs/b.1/f1
     write /config/usb_gadget/g1/UDC ${sys.usb.controller}
     setprop sys.usb.state adb
 
-# step 2: MTP + ADB, once MTP is ready
-on property:sys.usb.config=mtp,adb && property:sys.usb.ffs.ready=1 && property:sys.usb.ffs.mtp.ready=1 && property:sys.usb.configfs=1
+# B: MTP became ready -> switch once to MTP+ADB (deliberately NOT keyed on ffs.ready)
+on property:sys.usb.ffs.mtp.ready=1 && property:sys.usb.config=mtp,adb && property:sys.usb.configfs=1
     write /config/usb_gadget/g1/UDC "none"
     rm /config/usb_gadget/g1/configs/b.1/f1
     rm /config/usb_gadget/g1/configs/b.1/f2
@@ -37,7 +43,10 @@ on property:sys.usb.config=mtp,adb && property:sys.usb.ffs.ready=1 && property:s
     write /config/usb_gadget/g1/UDC ${sys.usb.controller}
     setprop sys.usb.state ${sys.usb.config}
 
-# leaving MTP: TWRP sets "none" then "adb"; TWRP's init.rc handles those, but make sure
-# a leftover f2 (adb in mtp_adb mode) does not stay linked
+# C: MTP was ready before adbd -> the bind in B failed; bind now, never unbind
+on property:sys.usb.ffs.ready=1 && property:sys.usb.ffs.mtp.ready=1 && property:sys.usb.config=mtp,adb && property:sys.usb.configfs=1
+    write /config/usb_gadget/g1/UDC ${sys.usb.controller}
+
+# leaving MTP: TWRP sets "none" then "adb"; TWRP's init.rc handles both - also drop f2
 on property:sys.usb.config=none && property:sys.usb.configfs=1
     rm /config/usb_gadget/g1/configs/b.1/f2
