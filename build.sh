@@ -36,6 +36,16 @@ BIG="prebuilts/clang/host/linux-x86 prebuilts/rust prebuilts/sdk prebuilts/tools
      prebuilts/jdk/jdk8 prebuilts/jdk/jdk11 prebuilts/jdk/jdk17 prebuilts/jdk/jdk21 prebuilts/vndk/v34
      prebuilts/clang-tools external/cronet external/skia external/llvm packages/modules/Bluetooth
      kernel/prebuilts/5.15/arm64 kernel/prebuilts/5.15/x86_64"
+# Google's source server sometimes answers HTTP 503 - retry instead of failing the run
+sync() {
+    local i
+    for i in 1 2 3 4; do
+        $SYNC "$@" && return 0
+        echo "   repo sync failed (try $i of 4) - waiting $((i * 60)) s and retrying"
+        sleep $((i * 60))
+    done
+    return 1
+}
 drop_git_objects() {
     find .repo/project-objects .repo/projects -mindepth 1 -maxdepth 8 -type d -name '*.git' -prune \
         ! -name 'android_bootable_recovery.git' ! -name 'android_vendor_twrp.git' \
@@ -46,7 +56,7 @@ disk() { echo "   [disk] $(df -h --output=used,avail . | tail -1 | awk '{print $
 ALL=$(repo list -a -p)
 SMALL=$(printf '%s\n' $ALL | grep -vxF -f <(printf '%s\n' $BIG))
 echo "   stage 1: $(echo "$SMALL" | wc -l) small projects"
-$SYNC $SMALL
+sync $SMALL
 drop_git_objects; disk
 # Trim a just-synced prebuilt down to what a Linux build uses (sizes measured on a
 # runner: clang 13 GB with 6 versions, rust 17 GB with 3 versions x 4 host OSes).
@@ -83,7 +93,7 @@ trim() {
 for p in $BIG; do
     printf '%s\n' $ALL | grep -qxF "$p" || continue
     echo "   stage 2: $p"
-    $SYNC "$p"
+    sync "$p"
     drop_git_objects
     trim "$p"
     echo "   $(du -sh "$p" | cut -f1)  $p"; disk
