@@ -25,7 +25,7 @@ RUNTIME = {"tw_time": "9:42 PM", "tw_battery": "87%", "tw_cpu_temp": "38", "tw_a
            "tw_mtp_enabled": "1", "tw_has_boot_slots": "1", "tw_reboot_system": "1",
            "tw_reboot_bootloader": "1", "tw_reboot_poweroff": "1", "tw_reboot_recovery": "0",
            "tw_busy": "0", "tw_no_cpu_temp": "0", "tw_no_battery_percent": "0", "tw_military_time": "0",
-           "tw_samsung_navbar": "0", "tw_simulate_actions": "0", "tw_language": "en.xml",
+           "tw_samsung_navbar": "0", "tw_simulate_actions": "0", "tw_language": "en",
            "asem_light": "0", "tw_has_data_media": "1"}
 
 
@@ -37,7 +37,7 @@ class Theme:
         ui = ET.parse(os.path.join(th, "portrait_hdpi", ui_name)).getroot()
         self.portrait = ET.parse(os.path.join(th, "common", "portrait.xml")).getroot()
         self.vars = dict(RUNTIME)
-        self.vars["tw_language"] = lang + ".xml"
+        self.vars["tw_language"] = lang  # like TWRP: name only, LoadLanguage adds ".xml"
         for v in ui.find("variables"):
             self.vars[v.get("name")] = self.sub(v.get("value"))
         self.vars.update({k: RUNTIME[k] for k in ("tw_time",)})

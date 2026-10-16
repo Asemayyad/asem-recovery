@@ -79,9 +79,11 @@ BOARD_KERNEL_IMAGE_NAME := Image.lz4
 BOARD_RAMDISK_USE_LZ4 := true
 BOARD_USES_GENERIC_KERNEL_IMAGE := true
 
-# Kernel modules: NOT packed here. The stock vendor_boot platform ramdisk (kept
-# byte-identical) has all 249 modules + modules.load.recovery (239), and
-# first-stage init loads them in recovery mode (touch, display, USB, UFS ...).
+# Kernel modules: the stock vendor_boot platform ramdisk (kept byte-identical) has
+# 249 modules + modules.load.recovery (239); first-stage init loads those in recovery
+# mode (display, keys, USB, UFS, battery ...). NOT touch: its driver + Transsion touch
+# framework are in odm_dlkm, and the framework refuses recovery boot mode - see the
+# "ASEM: touchscreen" block in recovery/root/init.recovery.mt6789.rc.
 
 # Recovery lives in vendor_boot (stock: fragment "recovery", type 2)
 TARGET_NO_RECOVERY := true
@@ -183,7 +185,10 @@ TW_EXCLUDE_TWRPAPP := true
 TW_INCLUDE_FASTBOOTD := true
 
 # Storage / USB - MTP is on by default in TWRP (PC sees the phone);
-# USB controller "musb-hdrc" is set by the stock init.recovery.mt6789.rc
+# USB controller "musb-hdrc" is set by the stock init.recovery.mt6789.rc.
+# TWRP's default init.recovery.usb.rc only knows legacy android_usb; this phone uses
+# configfs, so ours (recovery/root/init.recovery.usb.rc) adds the MTP+ADB gadget.
+TW_EXCLUDE_DEFAULT_USB_INIT := true
 RECOVERY_SDCARD_ON_DATA := true
 
 # Logging

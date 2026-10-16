@@ -13,3 +13,28 @@ on fs && property:ro.debuggable=0
 
 on boot
     exec u:r:update_engine:s0 root root -- /system/bin/mtk_plpath_utils
+
+# ASEM: touchscreen (FocalTech FT3683G, input "mtk-tpd"). Stock recovery has no touch:
+#  - the driver (focaltech_ft3683g) and Transsion's touch framework (adaptive-ts) live in
+#    odm_dlkm, not in modules.load.recovery
+#  - adaptive-ts refuses to start touch when the bootloader's boot mode (DT atag,boot) is
+#    2 = recovery ("bootmode=2 don't load touch"). adaptive-ts_asem.ko is the stock
+#    16.3.0.155SP15 module with ONE byte patched in mtk_get_boot_mode():
+#    .text+0xe80  mov w9,#0x304 -> mov w9,#0x300  (drops only the recovery bit; power-off
+#    charging modes 8/9 unchanged). Tested live 2026-10-16: TP Ready, Device ID 0x56.
+#  - deps already loaded by first-stage init in recovery: transsion_tranlog,
+#    mtk_disp_notify, thd, opsMediator (used by the display driver)
+#  - touch firmware: chip already has v27 = file v27 (no update); file kept for safety
+on init
+    insmod /lib/modules/asem/adaptive-ts_asem.ko
+    insmod /lib/modules/asem/focaltech_ft3683g.ko
+
+# ASEM: full CPU speed while in recovery. No Android power HAL runs here and TWRP draws
+# every frame in software at 1080x2436, so the default (slowest) clocks gave ~10 fps (R1).
+# policy0 = 6x Cortex-A55, policy6 = 2x Cortex-A76 (same files stock uses for its boot
+# boost). Recovery only - normal Android keeps its own CPU settings.
+on boot
+    write /sys/devices/system/cpu/cpufreq/policy0/scaling_governor performance
+    write /sys/devices/system/cpu/cpufreq/policy6/scaling_governor performance
+    write /sys/devices/system/cpu/cpufreq/policy0/scaling_min_freq 2000000
+    write /sys/devices/system/cpu/cpufreq/policy6/scaling_min_freq 2200000

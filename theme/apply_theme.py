@@ -24,8 +24,11 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.join(HERE, "tools"))
 from arabic import visual  # noqa: E402
 
-RTL = '<condition var1="tw_language" var2="ar.xml"/>'
-LTR = '<condition var1="tw_language" op="!=" var2="ar.xml"/>'
+# tw_language holds the language NAME ("en", "ar"); TWRP adds ".xml" itself
+# (PageManager::LoadLanguage -> languages/<name>.xml). R1 used "ar.xml" -> it looked for
+# ar.xml.xml, stayed English, while these conditions still mirrored the layout.
+RTL = '<condition var1="tw_language" var2="ar"/>'
+LTR = '<condition var1="tw_language" op="!=" var2="ar"/>'
 
 PALETTES = {
     "d": dict(bg="#0E1116", surface="#171B22", text="#E8ECF2", muted="#8A94A6",
@@ -156,7 +159,11 @@ def bidi_text(x_ltr, x_rtl, y, txt, font, color, c=""):
 
 
 def page(name, body, template="asem_page"):
-    return '<page name="%s"><template name="%s"/>%s</page>' % (name, template, body)
+    # The navbar Back/Home buttons only send a key; each page must say what it does.
+    # R1 had none on the ASEM pages: Back/Home did nothing (e.g. stuck in ASEM Transfer).
+    keys = "" if name == "main2" else (key_action("home", ("page", "main2")) +
+                                        key_action("back", ("page", "main2")))
+    return '<page name="%s"><template name="%s"/>%s%s</page>' % (name, template, keys, body)
 
 
 # --------------------------------------------------------------------------- shared parts
@@ -201,7 +208,7 @@ def home_page():
     b.append(image(44, 92, "asem_logo_120"))
     b.append(text(184, 98, "ASEM", "asem_f_brand", "%asem_text%"))
     b.append(text(186, 162, "RECOVERY", "asem_f_cap", "%asem_muted%"))
-    b.append(button(812, 98, [("set", "asem_light=%asem_target_light%"), ("reload", "")], "asem_btn_theme"))
+    # (no theme button on Home: switching from here misbehaved in R1; use Settings > Theme)
     b.append(button(932, 98, [("page", "asem_settings")], "asem_btn_gear"))
     # hero
     b.append(image(40, 236, "asem_hero"))
@@ -320,9 +327,9 @@ def settings_page():
                          "تحفظ تلقائيا وتبقى بعد إعادة التشغيل (عندما تكون البيانات مقروءة).")))
     segs = [
         ("globe", s("set_lang", "Language", "اللغة"), s("set_lang_s", "Menus and help", "القوائم والمساعدة"),
-         [(s("lang_en", "English", "English"), [("set", "tw_language=en.xml"), ("setlanguage", "")], cond("tw_language", "en.xml", "!=")),
-          (s("lang_ar", "العربية", "العربية"), [("set", "tw_language=ar.xml"), ("setlanguage", "")], cond("tw_language", "ar.xml", "!="))],
-         [cond("tw_language", "ar.xml", "!="), cond("tw_language", "ar.xml")]),
+         [(s("lang_en", "English", "English"), [("set", "tw_language=en"), ("setlanguage", "")], cond("tw_language", "en", "!=")),
+          (s("lang_ar", "العربية", "العربية"), [("set", "tw_language=ar"), ("setlanguage", "")], cond("tw_language", "ar", "!="))],
+         [cond("tw_language", "ar", "!="), cond("tw_language", "ar")]),
         ("clock", s("set_clock", "Clock", "الساعة"), s("set_clock_s", "Now %tw_time%", "الآن %tw_time%"),
          [(s("clock_12", "12-hour", "12 ساعة"), [("set", "tw_military_time=0")], ""),
           (s("clock_24", "24-hour", "24 ساعة"), [("set", "tw_military_time=1")], "")],
@@ -570,11 +577,17 @@ TWRP_AR = {
 # --------------------------------------------------------------------------- templates (ui.xml)
 STATUS = (
     '<text color="%asem_text%"><font resource="asem_f_status"/><placement x="44" y="16"/><text>%tw_time%</text></text>'
-    '<text color="%asem_text%"><conditions><condition var1="tw_no_battery_percent" var2="0"/>'
-    '<condition var1="tw_battery" op="&gt;" var2="0"/><condition var1="tw_battery" op="&lt;" var2="101"/></conditions>'
-    '<font resource="asem_f_status"/><placement x="1036" y="16" placement="1"/><text>%tw_battery%</text></text>'
+    # battery: % + outline, top-right. Only tw_no_battery_percent as condition: tw_battery is
+    # computed on read and never sends a change notification, so extra numeric conditions
+    # were evaluated once at page load (no reading yet) and hid it for good (R1).
+    '<text color="%asem_text%"><condition var1="tw_no_battery_percent" var2="0"/>'
+    '<font resource="asem_f_status"/><placement x="978" y="16" placement="1"/><text>%tw_battery%</text></text>'
+    + "".join('<fill color="%%asem_text%%"><condition var1="tw_no_battery_percent" var2="0"/>'
+              '<placement x="%d" y="%d" w="%d" h="%d"/></fill>' % r
+              for r in ((990, 24, 44, 3), (990, 45, 44, 3), (990, 24, 3, 24), (1031, 24, 3, 24), (1034, 31, 5, 10)))
+    +
     '<text color="%asem_muted%"><condition var1="tw_no_cpu_temp" var2="0"/><font resource="asem_f_status"/>'
-    '<placement x="860" y="16" placement="1"/><text>%tw_cpu_temp%&#xB0;C</text></text>')
+    '<placement x="840" y="16" placement="1"/><text>%tw_cpu_temp%&#xB0;C</text></text>')
 NAVBAR = (
     '<fill color="%asem_surface%"><condition var1="tw_busy" var2="0"/>'
     '<placement x="0" y="%navbar_y%" w="%screen_width%" h="%navbar_height%"/></fill>'
@@ -847,6 +860,17 @@ def check(root):
                     tgt = (el.text or "").strip()
                     if tgt and "%" not in tgt and tgt not in pages and tgt not in UPSTREAM_MISSING_PAGES:
                         errors.append("%s: %s target '%s' does not exist" % (where, el.get("function"), tgt))
+    # every ASEM page except Home must react to the navbar Back and Home keys
+    for pg in portrait.find("pages"):
+        if pg.get("name") in ("reboot", "asem_settings", "asem_slots", "asem_transfer"):
+            keys = set(t.get("key") for t in pg.iter("touch"))
+            for k in ("back", "home"):
+                if k not in keys:
+                    errors.append("page %s: no '%s' key handler (navbar button would do nothing)" % (pg.get("name"), k))
+    # language names: TWRP stores "en"/"ar" and adds ".xml" itself
+    if re.search(r'tw_language"[^>]*var2="[a-z]+\.xml"|tw_language=[a-z]+\.xml', read(os.path.join(common, "portrait.xml")) +
+                 "".join(read(os.path.join(hd, f)) for f in ("ui.xml", "ui_light.xml"))):
+        errors.append("tw_language compared/set with a .xml suffix (TWRP adds .xml itself)")
     # strings: every {@asem_...} used must exist in en.xml; ar.xml must be valid
     en_ids = set(st.get("name") for st in docs["common/languages/en.xml"].iter("string"))
     used = set(re.findall(r"\{@(asem_[a-z0-9_]+)=", read(os.path.join(common, "portrait.xml"))))
