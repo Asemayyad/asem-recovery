@@ -127,6 +127,23 @@ grep -q '// ASEM Recovery: always permissive' system/core/init/selinux.cpp || se
     system/core/init/selinux.cpp
 grep -q 'return false;  // ASEM Recovery: always permissive' system/core/init/selinux.cpp \
     || { echo "!! SELinux permissive patch did not apply"; exit 1; }
+# lptools "map" (used by ASEM Stock Restore to get a WRITABLE mapping of a logical
+# partition) hard-codes LP metadata slot 0 = the _a layout. On this Virtual A/B phone
+# running slot b, slot 0 has no *_b partitions, so map failed. Use the current slot's
+# metadata, like fs_mgr does at boot.
+python3 - external/lptools/lptools.cc <<'PYEOF'
+import sys
+p = sys.argv[1]; s = open(p).read()
+mark = "// ASEM: current slot metadata"
+if mark not in s:
+    i = s.index('strcmp(argv[1], "map") == 0')
+    j = s.index(".metadata_slot = 0,", i)
+    s = s[:j] + ('.metadata_slot = SlotNumberForSlotSuffix(::android::base::GetProperty('
+                 '"ro.boot.slot_suffix", "")),  ' + mark) + s[j + len(".metadata_slot = 0,"):]
+    open(p, "w").write(s)
+PYEOF
+grep -q '// ASEM: current slot metadata' external/lptools/lptools.cc \
+    || { echo "!! lptools map patch did not apply"; exit 1; }
 
 echo "== copying device tree"
 rm -rf device/infinix/X6855
