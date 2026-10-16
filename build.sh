@@ -105,6 +105,9 @@ export ASEM_DECRYPT=${ASEM_DECRYPT:-false}
 set +u
 source build/envsetup.sh
 lunch twrp_X6855-ap2a-eng
+# TWRP 14.1's twrp_ramdisk step copies system/etc/task_profiles.json, but only lists
+# it as a dependency when crypto is on (TW_INCLUDE_CRYPTO) - so build it first.
+mka task_profiles.json
 mka vendorbootimage
 set -u
 
