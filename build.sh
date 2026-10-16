@@ -50,7 +50,13 @@ sync() {
     local i
     for i in 1 2 3 4; do
         $SYNC "$@" && return 0
-        echo "   repo sync failed (try $i of 4) - waiting $((i * 60)) s and retrying"
+        echo "   repo sync failed (try $i of 4) - cleaning the partial download, retrying in $((i * 60)) s"
+        # A broken fetch leaves its half-downloaded pack behind (#16: clang, several GB),
+        # and the retry then ran out of disk. Remove temporary packs; in stage 2 (one big
+        # project at a time) also drop that project's partial git objects.
+        find .repo -type f \( -name 'tmp_pack_*' -o -name 'tmp_idx_*' -o -name 'incoming-*' \) -delete 2>/dev/null
+        [ "${SYNC_STAGE:-1}" = 2 ] && drop_git_objects
+        df -h --output=avail . | tail -1 | sed 's/^/   free now: /'
         sleep $((i * 60))
     done
     return 1
@@ -99,6 +105,7 @@ trim() {
         done ;;
     esac
 }
+SYNC_STAGE=2   # retries may now drop the failed project's partial objects
 for p in $BIG; do
     printf '%s\n' $ALL | grep -qxF "$p" || continue
     echo "   stage 2: $p"
