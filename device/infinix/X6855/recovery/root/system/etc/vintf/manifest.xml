@@ -1,0 +1,3 @@
+<!-- ASEM Recovery: base framework manifest (Android 14 servicemanager needs a base
+     manifest.xml; without it no AIDL service could register). -->
+<manifest version="1.0" type="framework"/>

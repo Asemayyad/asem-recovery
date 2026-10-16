@@ -105,6 +105,11 @@ class Theme:
         if c2 is not None:
             cs += list(c2.findall("condition"))
         for c in cs:
+            if c.get("var1") == "fileexists":  # like TWRP: file on the phone -> PREVIEW_FILES set
+                hit = c.get("var2", "") in PREVIEW_FILES
+                if hit != (c.get("op", "=") != "!="):
+                    return False
+                continue
             a = self.vars.get(c.get("var1"), "")
             b = self.sub(c.get("var2", ""))
             op = c.get("op", "=")
@@ -116,6 +121,11 @@ class Theme:
             if not ok:
                 return False
         return True
+
+
+# Files the Slots page checks with "fileexists" - the state the phone reported on 2026-10-16
+# (next boot B, only B bootable) plus the "A refused" message, so the preview shows reality.
+PREVIEW_FILES = {"/tmp/asem_slot/next_B", "/tmp/asem_slot/bootable_B", "/tmp/asem_slot/msg_refused_A"}
 
 
 def anchor(x, y, w, h, placement):

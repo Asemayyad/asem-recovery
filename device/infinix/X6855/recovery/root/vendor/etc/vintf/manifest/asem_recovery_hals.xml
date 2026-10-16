@@ -1,0 +1,14 @@
+<!-- ASEM Recovery: AIDL HALs of the recovery itself. The stock/TWRP fragments for these sit
+     in /system/etc/vintf/manifest as type="device", which the Android 14 servicemanager
+     refuses there ("Cannot add a device manifest to a framework manifest").
+     Proven live 2026-10-16: boot HAL registered, bootctl answered (2 slots, current B). -->
+<manifest version="1.0" type="device">
+    <hal format="aidl">
+        <name>android.hardware.boot</name>
+        <fqname>IBootControl/default</fqname>
+    </hal>
+    <hal format="aidl">
+        <name>android.hardware.fastboot</name>
+        <fqname>IFastboot/default</fqname>
+    </hal>
+</manifest>

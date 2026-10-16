@@ -1,0 +1,3 @@
+<!-- ASEM Recovery: base device manifest - fragments in manifest/ are added to it.
+     Without it (R1/R2) servicemanager had NO device manifest and rejected every AIDL HAL. -->
+<manifest version="1.0" type="device" target-level="8"/>

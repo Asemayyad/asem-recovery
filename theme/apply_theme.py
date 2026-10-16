@@ -193,7 +193,8 @@ TILES = [  # icon, page/actions, label, hint, (ar label, ar hint)
     ("bolt", [("page", "fastboot")], s("t_fastboot", "Fastboot", "فاستبوت"), s("h_fastboot", "Flash from your PC", "التفليش من الكمبيوتر")),
     ("usb", [("page", "sideload")], s("t_sideload", "ADB Sideload", "سايدلود ADB"), s("h_sideload", "Send a zip from your PC", "إرسال ملف من الكمبيوتر")),
     ("transfer", [("page", "asem_transfer")], s("t_transfer", "ASEM Transfer", "نقل ASEM"), s("h_transfer", "Copy files from your PC", "نسخ ملفات من الكمبيوتر")),
-    ("AB", [("page", "asem_slots")], s("t_slots", "Slots", "الخانات"), s("h_slots", "Switch between A and B", "التبديل بين A و B")),
+    ("AB", [("cmd", "sh /system/bin/asem_slot.sh status fresh"), ("page", "asem_slots")],
+     s("t_slots", "Slots", "الخانات"), s("h_slots", "Switch between A and B", "التبديل بين A و B")),
     ("term", [("page", "terminalcommand")], s("t_terminal", "Terminal", "الطرفية"), s("h_terminal", "Type shell commands", "كتابة أوامر")),
     ("adv", [("page", "advanced")], s("t_advanced", "Advanced", "متقدم"), s("h_advanced", "Logs, fix tools, extras", "سجلات وأدوات إصلاح")),
 ]
@@ -379,37 +380,62 @@ def settings_page():
 
 # --------------------------------------------------------------------------- Slots
 def slots_page():
+    # Real slot status + switching through asem_slot.sh (bootctl / AIDL boot HAL). TWRP's own
+    # "setbootslot" only speaks HIDL, failed on this phone and still showed success (R2).
+    # The script writes /tmp/asem_slot/* ; TWRP re-checks "fileexists" conditions whenever a
+    # page opens, so every button runs the script and then reopens this page.
+    F = "/tmp/asem_slot/"
+    fe = lambda f: cond("fileexists", F + f)
     b = [header(s("slots_title", "Slots", "الخانات"), "asem_help_slots")]
     b.append(lead(236, s("slots_lead1", "Your phone keeps two copies of the system: A and B.", "هاتفك يحتفظ بنسختين من النظام: A و B.")))
     b.append(lead(282, s("slots_lead2", "The active one starts at power on.", "النسخة النشطة هي التي تعمل عند التشغيل.")))
     yes = cond("tw_has_boot_slots", "1")
     b.append(image(40, 350, "asem_card", 0, yes))
-    b.append(text(540, 430, s("slots_active", "Active slot: %tw_active_slot%", "الخانة النشطة: %tw_active_slot%"),
-                  "asem_f_h1", "%asem_accent%", 4, yes))
-    b.append(text(540, 500, s("slots_active_s", "This is the system that starts now", "هذا هو النظام الذي يعمل الآن"),
-                  "asem_f_row_s", "%asem_muted%", 4, yes))
-    for k, slot in enumerate("AB"):
+    b.append(text(540, 410, s("slots_running", "Running now: slot %tw_active_slot%", "يعمل الآن: الخانة %tw_active_slot%"),
+                  "asem_f_h2", "%asem_text%", 4, yes))
+    for L in "AB":
+        b.append(text(540, 480, s("slots_next_" + L.lower(), "Next boot: slot " + L, "التشغيل القادم: الخانة " + L),
+                      "asem_f_h1", "%asem_accent%", 4, conds(yes, fe("next_" + L))))
+    b.append(text(540, 480, s("slots_nohal", "Slot service not available - switching is off",
+                              "خدمة الخانات غير متاحة - التبديل متوقف"), "asem_f_body", "%asem_danger%", 4, conds(yes, fe("nohal"))))
+    for k, L in enumerate("AB"):
         x = 40 + k * 510
-        acts = [("set", "tw_back=asem_slots"), ("set", "tw_action=setbootslot"), ("set", "tw_action_param=" + slot),
-                ("set", "tw_has_action2=0"),
-                ("set", "tw_action_text1={@changing_boot_slot=Changing Boot Slot}"), ("set", "tw_action_text2="),
-                ("set", "tw_complete_text1={@changing_boot_slot_complete=Change Boot Slot Complete}"),
-                ("page", "action_page")]
-        b.append(button(x, 640, acts, "asem_btn_half", c=yes))
-        label = s("slots_make_" + slot.lower(), "Make slot %s active" % slot, "تفعيل الخانة %s" % slot)
-        b.append(text(x + 245, 704, label, "asem_f_btn", "%asem_text%", 4, yes))
-    b.append(image(40, 830, "asem_card_warn", 0, yes))
-    b.append(bidi_text(80, 1000, 862, s("slots_warn1", "Only switch to a slot that has a working system.",
+        acts = [("cmd", "sh /system/bin/asem_slot.sh set " + L), ("page", "asem_slots_wait")]
+        b.append(button(x, 620, acts, "asem_btn_half", c=yes))
+        b.append(text(x + 245, 684, s("slots_make_" + L.lower(), "Make slot %s active" % L, "تفعيل الخانة %s" % L),
+                      "asem_f_btn", "%asem_text%", 4, yes))
+        b.append(text(x + 245, 784, s("slots_ok_" + L.lower(), "Has a working system", "فيها نظام يعمل"),
+                      "asem_f_lead", "%asem_accent%", 4, conds(yes, fe("bootable_" + L))))
+        b.append(text(x + 245, 784, s("slots_bad_" + L.lower(), "No working system", "لا يوجد نظام يعمل"),
+                      "asem_f_lead", "%asem_danger%", 4, conds(yes, cond("fileexists", F + "nohal", "!="),
+                                                                 cond("fileexists", F + "bootable_" + L, "!="))))
+    msgs = [("msg_done_A", s("slots_done_a", "Done: slot A starts at the next reboot.", "تم: الخانة A تعمل عند إعادة التشغيل القادمة."), "%asem_accent%"),
+            ("msg_done_B", s("slots_done_b", "Done: slot B starts at the next reboot.", "تم: الخانة B تعمل عند إعادة التشغيل القادمة."), "%asem_accent%"),
+            ("msg_already_A", s("slots_already_a", "Slot A is already the next-boot slot.", "الخانة A هي بالفعل خانة التشغيل القادم."), "%asem_muted%"),
+            ("msg_already_B", s("slots_already_b", "Slot B is already the next-boot slot.", "الخانة B هي بالفعل خانة التشغيل القادم."), "%asem_muted%"),
+            ("msg_refused_A", s("slots_refused_a", "Not switched: slot A has no working system.", "لم يتم التبديل: الخانة A لا تحتوي نظاما يعمل."), "%asem_danger%"),
+            ("msg_refused_B", s("slots_refused_b", "Not switched: slot B has no working system.", "لم يتم التبديل: الخانة B لا تحتوي نظاما يعمل."), "%asem_danger%"),
+            ("msg_fail", s("slots_fail", "Switch failed - nothing was changed.", "فشل التبديل - لم يتغير شيء."), "%asem_danger%"),
+            ("msg_nohal", s("slots_msg_nohal", "Slot service not available - nothing was changed.", "خدمة الخانات غير متاحة - لم يتغير شيء."), "%asem_danger%")]
+    for f, txt, col in msgs:
+        b.append(text(540, 850, txt, "asem_f_body", col, 4, conds(yes, fe(f))))
+    b.append(image(40, 910, "asem_card_warn", 0, yes))
+    b.append(bidi_text(80, 1000, 942, s("slots_warn1", "Only switch to a slot that has a working system.",
                                          "بدل فقط إلى خانة فيها نظام يعمل."), "asem_f_body", "%asem_warn%", yes))
-    b.append(bidi_text(80, 1000, 914, s("slots_warn2", "If it does not boot, come back here and switch back.",
+    b.append(bidi_text(80, 1000, 994, s("slots_warn2", "If it does not boot, come back here and switch back.",
                                          "إذا لم يعمل، ارجع هنا وبدل مرة أخرى."), "asem_f_lead", "%asem_warn%", yes))
-    b.append(bidi_text(80, 1000, 960, s("slots_warn3", "Your data is shared by both slots.",
-                                         "بياناتك مشتركة بين الخانتين."), "asem_f_lead", "%asem_warn%", yes))
-    b.append(button(122, 1150, [("page", "reboot")], "asem_btn_primary", c=yes))
-    b.append(text(540, 1214, s("reboot_to", "Reboot to...", "إعادة التشغيل إلى..."), "asem_f_btn", "%asem_ink%", 4, yes))
+    b.append(bidi_text(80, 1000, 1040, s("slots_warn3", "Your data is shared by both slots.",
+                                          "بياناتك مشتركة بين الخانتين."), "asem_f_lead", "%asem_warn%", yes))
+    b.append(button(122, 1200, [("page", "reboot")], "asem_btn_primary", c=yes))
+    b.append(text(540, 1264, s("reboot_to", "Reboot to...", "إعادة التشغيل إلى..."), "asem_f_btn", "%asem_ink%", 4, yes))
     b.append(text(540, 430, s("slots_none", "This phone has no A/B slots", "هذا الهاتف لا يحتوي على خانات A/B"),
                   "asem_f_h2", "%asem_muted%", 4, cond("tw_has_boot_slots", "0")))
     return page("asem_slots", "".join(b))
+
+
+def slots_wait_page():
+    # reopening asem_slots from here makes TWRP re-check its "fileexists" conditions
+    return page("asem_slots_wait", page_action("", ("page", "asem_slots")))
 
 
 # --------------------------------------------------------------------------- ASEM Transfer
@@ -812,7 +838,7 @@ def patch_portrait(src):
     old = '<action function="set">tw_password_fail=1</action>'
     assert x[i:j].count(old) == 1, "trydecrypt failure branch"
     x = x[:i] + x[i:j].replace(old, old + '\n\t\t\t\t\t<action function="set">asem_dec_chosen=0</action>', 1) + x[j:]
-    pages = [home_page(), reboot_page(), settings_page(), slots_page(), transfer_page(), decrypt_page()]
+    pages = [home_page(), reboot_page(), settings_page(), slots_page(), transfer_page(), decrypt_page(), slots_wait_page()]
     pages += [help_page(k) for k in HELP]
     x, n = re.subn(r"(\n\t</pages>)", "\n<!-- ASEM Recovery pages -->\n" + "\n".join(pages) + r"\1", x, count=1)
     assert n == 1, "</pages> not found"
@@ -931,7 +957,7 @@ def check(root):
                         errors.append("%s: %s target '%s' does not exist" % (where, el.get("function"), tgt))
     # every ASEM page except Home must react to the navbar Back and Home keys
     for pg in portrait.find("pages"):
-        if pg.get("name") in ("reboot", "asem_settings", "asem_slots", "asem_transfer", "asem_decrypt"):
+        if pg.get("name") in ("reboot", "asem_settings", "asem_slots", "asem_transfer", "asem_decrypt", "asem_slots_wait"):
             keys = set(t.get("key") for t in pg.iter("touch"))
             for k in ("back", "home"):
                 if k not in keys:
