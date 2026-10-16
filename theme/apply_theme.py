@@ -204,6 +204,8 @@ def home_page():
     # theme: reload when the saved choice differs from the loaded file
     b.append(page_action(conds(cond("asem_light", "1"), cond("asem_is_light", "0")), ("reload", "")))
     b.append(page_action(conds(cond("asem_light", "0"), cond("asem_is_light", "1")), ("reload", "")))
+    # back on Home: the next "Decrypt Data" starts at the lock-type chooser again
+    b.append(page_action("", ("set", "asem_dec_chosen=0")))
     # top bar
     b.append(image(44, 92, "asem_logo_120"))
     b.append(text(184, 98, "ASEM", "asem_f_brand", "%asem_text%"))
@@ -441,6 +443,58 @@ def transfer_page():
     return page("asem_transfer", "".join(b))
 
 
+# --------------------------------------------------------------------------- Unlock your data (decrypt)
+# Asem's design: ask which screen lock the phone uses (Pattern / PIN / Password / No lock),
+# then open the matching TWRP input. TWRP's own "decrypt" page routes here first while
+# asem_dec_chosen=0; a wrong entry (tw_password_fail=1) comes back here with a message.
+# TWRP lock types (tw_crypto_pwtype): 0 none, 1 password, 2 pattern, 3 PIN.
+# tw_crypto_pwtype_0 = the type TWRP detected for user 0 -> highlighted button.
+# "No lock" = TWRP's default password "!" (what TWRP itself tries at start-up).
+DECRYPT_CHOICES = [  # pwtype, x, y, label
+    ("2", 40, 820, s("dc_pattern", "Pattern", "نمط")),
+    ("3", 550, 820, s("dc_pin", "PIN (numbers)", "رمز PIN (أرقام)")),
+    ("1", 40, 970, s("dc_password", "Password", "كلمة مرور")),
+    ("0", 550, 970, s("dc_nolock", "No lock", "بدون قفل")),
+]
+
+
+def decrypt_page():
+    b = [header(s("dc_title", "Unlock your data", "فتح بياناتك"))]
+    b.append(lead(236, s("dc_lead", "Your data is encrypted. Choose the screen lock you use on this phone.",
+                         "بياناتك مشفرة. اختر قفل الشاشة الذي تستخدمه في هذا الهاتف.")))
+    b.append(image(40, 300, "asem_card_warn"))
+    b.append(bidi_text(80, 1000, 340, s("dc_w1", "Use the EXACT PIN, pattern or password of this phone.",
+                                        "استخدم نفس رمز PIN أو النمط أو كلمة المرور تماما."), "asem_f_body", "%asem_warn%"))
+    b.append(bidi_text(80, 1000, 386, s("dc_w2", "A wrong entry shows Wrong input. Nothing changes - try again.",
+                                        "الإدخال الخاطئ يظهر إدخال خاطئ. لا يتغير شيء - حاول مرة أخرى."), "asem_f_lead", "%asem_warn%"))
+    b.append(bidi_text(80, 1000, 432, s("dc_w3", "Choose No lock only if the phone has no screen lock.",
+                                        "اختر بدون قفل فقط إذا لم يكن للهاتف قفل شاشة."), "asem_f_lead", "%asem_warn%"))
+    fail = cond("tw_password_fail", "1")
+    b.append(bidi_text(44, 1036, 560, s("dc_wrong", "Wrong input - that did not unlock the data.",
+                                        "إدخال خاطئ - لم يفتح ذلك البيانات."), "asem_f_h2", "%asem_danger%", fail))
+    b.append(bidi_text(44, 1036, 614, s("dc_wrong2", "Check your lock type and try again.",
+                                        "تأكد من نوع القفل وحاول مرة أخرى."), "asem_f_lead", "%asem_danger%", fail))
+    for val, lab in (("1", s("dc_det_password", "Detected on this phone: Password", "المكتشف في هذا الهاتف: كلمة مرور")),
+                     ("2", s("dc_det_pattern", "Detected on this phone: Pattern", "المكتشف في هذا الهاتف: نمط")),
+                     ("3", s("dc_det_pin", "Detected on this phone: PIN", "المكتشف في هذا الهاتف: رمز PIN"))):
+        b.append(bidi_text(44, 1036, 700, lab, "asem_f_body", "%asem_accent%", cond("tw_crypto_pwtype_0", val)))
+    for pw, x, y, lab in DECRYPT_CHOICES:
+        if pw == "0":
+            acts = [("set", "tw_crypto_user_id=0"), ("set", "tw_crypto_password=!"), ("set", "tw_password_fail=0"),
+                    ("set", "asem_dec_chosen=1"), ("page", "trydecrypt")]
+        else:
+            acts = [("set", "tw_crypto_user_id=0"), ("set", "tw_crypto_password="), ("set", "tw_password_fail=0"),
+                    ("set", "tw_crypto_pwtype=" + pw), ("set", "asem_dec_chosen=1"), ("page", "decrypt")]
+        for side, bx in ((LTR, x), (RTL, 590 - x)):  # Arabic: grid mirrored like the Home tiles
+            det = conds(side, cond("tw_crypto_pwtype_0", pw))
+            other = conds(side, cond("tw_crypto_pwtype_0", pw, "!="))
+            b.append(button(bx, y, acts, "asem_btn_half_primary", c=det))
+            b.append(button(bx, y, acts, "asem_btn_half", c=other))
+            b.append(text(bx + 245, y + 64, lab, "asem_f_btn", "%asem_ink%", 4, det))
+            b.append(text(bx + 245, y + 64, lab, "asem_f_btn", "%asem_text%", 4, other))
+    return page("asem_decrypt", "".join(b))
+
+
 # --------------------------------------------------------------------------- help sheets
 HELP = {
     "install": (s("hp_install", "How to install a ROM", "كيف تثبت روم"), [
@@ -663,6 +717,7 @@ def make_ui(src, t):
                  "asem_target_light": "0" if t == "l" else "1"}
     v = "\n".join('\t\t<variable name="%s" value="%s"/>' % kv for kv in asem_vars.items())
     v += '\n\t\t<variable name="asem_light" value="%s" persist="1"/>' % ("1" if t == "l" else "0")
+    v += '\n\t\t<variable name="asem_dec_chosen" value="0"/>'
     x = x.replace("\t</variables>", v + "\n\t</variables>", 1)
     # templates: replace TWRP's "page" template, add ASEM ones
     twrp_page, asem_tpl = templates()
@@ -743,7 +798,21 @@ def patch_portrait(src):
                '<image resource="asem_btn_help"/><action function="overlay">asem_help_' + key + '</action></button>')
         x, n = re.subn(r'(<page name="%s">\s*<template name="page"/>)' % pg, lambda m: m.group(1) + btn, x, count=1)
         assert n == 1, "help button target not found: " + pg
-    pages = [home_page(), reboot_page(), settings_page(), slots_page(), transfer_page()]
+    # decrypt: route to the ASEM lock-type chooser first (until a type was chosen)
+    i = x.index('<page name="decrypt">'); j = x.index("</page>", i)
+    d = x[i:j].replace('<template name="page"/>', '<template name="page"/>\n\t\t\t<action>'
+                       '<condition var1="asem_dec_chosen" var2="0"/><action function="page">asem_decrypt</action></action>', 1)
+    for t in ("2", "3"):
+        old = '<condition var1="tw_crypto_pwtype" var2="%s"/>' % t
+        assert d.count(old) == 1, "decrypt routing " + t
+        d = d.replace(old, '<conditions>%s<condition var1="asem_dec_chosen" var2="1"/></conditions>' % old, 1)
+    x = x[:i] + d + x[j:]
+    # trydecrypt: on failure go back through the chooser (it shows "Wrong input")
+    i = x.index('<page name="trydecrypt">'); j = x.index("</page>", i)
+    old = '<action function="set">tw_password_fail=1</action>'
+    assert x[i:j].count(old) == 1, "trydecrypt failure branch"
+    x = x[:i] + x[i:j].replace(old, old + '\n\t\t\t\t\t<action function="set">asem_dec_chosen=0</action>', 1) + x[j:]
+    pages = [home_page(), reboot_page(), settings_page(), slots_page(), transfer_page(), decrypt_page()]
     pages += [help_page(k) for k in HELP]
     x, n = re.subn(r"(\n\t</pages>)", "\n<!-- ASEM Recovery pages -->\n" + "\n".join(pages) + r"\1", x, count=1)
     assert n == 1, "</pages> not found"
@@ -862,7 +931,7 @@ def check(root):
                         errors.append("%s: %s target '%s' does not exist" % (where, el.get("function"), tgt))
     # every ASEM page except Home must react to the navbar Back and Home keys
     for pg in portrait.find("pages"):
-        if pg.get("name") in ("reboot", "asem_settings", "asem_slots", "asem_transfer"):
+        if pg.get("name") in ("reboot", "asem_settings", "asem_slots", "asem_transfer", "asem_decrypt"):
             keys = set(t.get("key") for t in pg.iter("touch"))
             for k in ("back", "home"):
                 if k not in keys:

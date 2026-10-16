@@ -222,6 +222,7 @@ def main(root, out_dir):
             ("ui.xml", "en", "reboot", None), ("ui_light.xml", "ar", "reboot", None),
             ("ui.xml", "en", "asem_settings", None), ("ui.xml", "ar", "asem_settings", None),
             ("ui.xml", "en", "asem_slots", None), ("ui_light.xml", "en", "asem_transfer", None),
+            ("ui.xml", "en", "asem_decrypt", None), ("ui_light.xml", "ar", "asem_decrypt", None),
             ("ui.xml", "en", "install", "asem_help_install"), ("ui.xml", "ar", "main2", "asem_help_reboot"),
             ("ui.xml", "en", "install", None), ("ui_light.xml", "en", "wipe", None)]
     missing = set()
