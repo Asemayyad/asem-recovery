@@ -55,6 +55,14 @@ on boot
 on early-init
     mkdir /system/bin/bootstrap 0755 root root
     symlink /system/bin/linker64 /system/bin/bootstrap/linker64
+    # Framework VINTF manifest: these three fragments are type="device" but sit in the
+    # system folder; the A14 servicemanager then drops the WHOLE framework manifest
+    # ("Cannot add a device manifest to a framework manifest", seen live 2026-10-16),
+    # which would also reject keystore2 (needed for decryption). Boot + fastboot are
+    # declared in vendor/etc/vintf/manifest/asem_recovery_hals.xml instead. RAM only.
+    rm /system/etc/vintf/manifest/android.hardware.fastboot-service.example.xml
+    rm /system/etc/vintf/manifest/android.hardware.boot-service.mtk.xml
+    rm /system/etc/vintf/manifest/android.hardware.health-service.example.xml
 
 service asem.bootctl /system/bin/hw/android.hardware.boot-service.mtk_recovery
     user root
