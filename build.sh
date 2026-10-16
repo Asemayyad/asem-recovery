@@ -119,6 +119,14 @@ sed -i 's/^LOCAL_REQUIRED_MODULES += init_second_stage\.recovery /LOCAL_REQUIRED
     bootable/recovery/prebuilt/Android.mk
 grep -q '^LOCAL_REQUIRED_MODULES += task_profiles.json init_second_stage.recovery' bootable/recovery/prebuilt/Android.mk \
     || { echo "!! task_profiles.json patch did not apply"; exit 1; }
+# SELinux permissive in recovery. R1 ran Enforcing (TWRP's policy) and crash-looped on
+# denials (black screen). Usual fix is androidboot.selinux=permissive on the cmdline, but
+# here cmdline/bootconfig are shared with normal boot, so patch TWRP's init instead: that
+# init only exists in the recovery fragment; normal boot keeps the stock one.
+grep -q '// ASEM Recovery: always permissive' system/core/init/selinux.cpp || sed -i 's|^bool IsEnforcing() {$|bool IsEnforcing() {\n    return false;  // ASEM Recovery: always permissive (this init is recovery-only)|' \
+    system/core/init/selinux.cpp
+grep -q 'return false;  // ASEM Recovery: always permissive' system/core/init/selinux.cpp \
+    || { echo "!! SELinux permissive patch did not apply"; exit 1; }
 
 echo "== copying device tree"
 rm -rf device/infinix/X6855
