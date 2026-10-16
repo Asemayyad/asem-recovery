@@ -181,3 +181,35 @@ in the device tree / a per-device config. X6855 is the first device.
   - "ASEM Transfer": an MTP storage in RAM so the PC can copy a ROM even when
     /data is encrypted or wiped.
 - R3 - decryption (stock Trustonic KeyMint/Gatekeeper/mcDriverDaemon in recovery).
+
+---
+
+## Credits
+
+- **[TeamWin - TWRP](https://twrp.me)** - ASEM Recovery is built on TWRP (android-14.1,
+  GPLv3). Thank you to the TWRP team and its contributors.
+- **[minimal-manifest-twrp](https://github.com/minimal-manifest-twrp)** - the TWRP source manifest.
+- **[phhusson - lptools](https://github.com/phhusson/vendor_lptools)** - dynamic partition tool (patched here to use the current slot).
+- **[Tajawal](https://fonts.google.com/specimen/Tajawal)** font (SIL Open Font License) - Arabic and English text.
+- The Infinix X6855 / OrangeFox community device trees - used as reference.
+
+**ASEM Recovery - created by Asem**
+
+- Telegram: [@Asemfuad](https://t.me/Asemfuad)
+- Instagram: [@asem.dev](https://instagram.com/asem.dev)
+
+<div dir="rtl" align="right">
+
+## الشكر والتقدير
+
+- **فريق TeamWin ومشروع [TWRP](https://twrp.me)** — ريكفري ASEM مبني على TWRP، فكل الشكر لفريقه
+  وكل المساهمين فيه.
+- مشاريع مفتوحة المصدر استُخدمت في البناء: minimal-manifest-twrp وأداة lptools وخط Tajawal.
+
+**ريكفري ASEM — من تطوير عاصم (Asem)**
+
+للتواصل:
+- تيليجرام: [@Asemfuad](https://t.me/Asemfuad)
+- إنستغرام: [@asem.dev](https://instagram.com/asem.dev)
+
+</div>
