@@ -189,6 +189,11 @@ TW_INCLUDE_FASTBOOTD := true
 # TWRP's default init.recovery.usb.rc only knows legacy android_usb; this phone uses
 # configfs, so ours (recovery/root/init.recovery.usb.rc) adds the MTP+ADB gadget.
 TW_EXCLUDE_DEFAULT_USB_INIT := true
+
+# Battery %: TWRP's default asks the health HAL, which does not run in this recovery, so
+# tw_battery stayed empty (R1: outline but no number). Read sysfs directly instead -
+# /sys/class/power_supply/battery/capacity works in recovery (mt6358_battery is loaded).
+TW_USE_LEGACY_BATTERY_SERVICES := true
 RECOVERY_SDCARD_ON_DATA := true
 
 # Logging
