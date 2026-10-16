@@ -1,4 +1,6 @@
 import /init.recovery.project.rc
+# decryption services - present only in ASEM_DECRYPT builds (missing file = skipped)
+import /init.recovery.asem_decrypt.rc
 
 on init
     setprop sys.usb.configfs 1

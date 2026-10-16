@@ -165,7 +165,7 @@ echo "== packing ASEM Recovery into stock vendor_boot"
 mkdir -p "$HERE/out"
 # keep the raw TWRP build too, so a packing problem never loses a finished build
 cp out/target/product/X6855/vendor_boot.img "$HERE/out/twrp_built_vendor_boot.img"
-IMG="$HERE/out/ASEM_Recovery_X6855_${VERSION}.img"
+IMG="$HERE/out/ASEM_Recovery_X6855_${VERSION}$([ "$ASEM_DECRYPT" = true ] && echo _decrypt).img"
 python3 "$HERE/tools/asem_vendor_boot.py" replace "$STOCK" out/target/product/X6855/vendor_boot.img "$IMG"
 python3 "$HERE/tools/asem_vendor_boot.py" info "$IMG"
 (cd "$HERE/out" && sha256sum "$(basename "$IMG")" > "$(basename "$IMG").sha256")

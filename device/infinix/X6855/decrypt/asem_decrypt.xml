@@ -1,0 +1,35 @@
+<!-- ASEM Recovery (ASEM_DECRYPT builds): VINTF declarations for the stock Trustonic
+     security HALs, copied from the stock 16.3.0.155SP15 vendor manifest fragments, so
+     the recovery's servicemanager lets them register. -->
+<manifest version="1.0" type="device">
+    <hal format="aidl">
+        <name>android.hardware.security.keymint</name>
+        <version>3</version>
+        <fqname>IKeyMintDevice/default</fqname>
+    </hal>
+    <hal format="aidl">
+        <name>android.hardware.security.keymint</name>
+        <version>1</version>
+        <fqname>IRemotelyProvisionedComponent/default</fqname>
+    </hal>
+    <hal format="aidl">
+        <name>android.hardware.security.sharedsecret</name>
+        <fqname>ISharedSecret/default</fqname>
+    </hal>
+    <hal format="aidl">
+        <name>android.hardware.security.secureclock</name>
+        <fqname>ISecureClock/default</fqname>
+    </hal>
+    <hal format="aidl">
+        <name>android.hardware.gatekeeper</name>
+        <fqname>IGatekeeper/default</fqname>
+    </hal>
+    <hal format="aidl">
+        <name>vendor.trustonic.tee</name>
+        <fqname>ITee/default</fqname>
+    </hal>
+    <hal format="aidl">
+        <name>vendor.trustonic.tui</name>
+        <fqname>ITui/default</fqname>
+    </hal>
+</manifest>

@@ -26,3 +26,13 @@ PRODUCT_PACKAGES += \
 # Soong namespaces
 PRODUCT_SOONG_NAMESPACES += \
     $(LOCAL_PATH)
+
+# Decryption (ASEM_DECRYPT=true builds only): stock Trustonic TEE / KeyMint / Gatekeeper
+# run from the phone's own vendor partition (read-only) - see decrypt/*.
+ifeq ($(ASEM_DECRYPT),true)
+PRODUCT_COPY_FILES += \
+    $(LOCAL_PATH)/decrypt/init.recovery.asem_decrypt.rc:$(TARGET_COPY_OUT_RECOVERY)/root/init.recovery.asem_decrypt.rc \
+    $(LOCAL_PATH)/decrypt/asem_decrypt_setup.sh:$(TARGET_COPY_OUT_RECOVERY)/root/system/bin/asem_decrypt_setup.sh \
+    $(LOCAL_PATH)/decrypt/prebuilt/libasem_shim.so:$(TARGET_COPY_OUT_RECOVERY)/root/system/lib64/libasem_shim.so \
+    $(LOCAL_PATH)/decrypt/asem_decrypt.xml:$(TARGET_COPY_OUT_RECOVERY)/root/vendor/etc/vintf/manifest/asem_decrypt.xml
+endif
