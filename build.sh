@@ -138,6 +138,18 @@ grep -q '// ASEM Recovery: always permissive' system/core/init/selinux.cpp || se
     system/core/init/selinux.cpp
 grep -q 'return false;  // ASEM Recovery: always permissive' system/core/init/selinux.cpp \
     || { echo "!! SELinux permissive patch did not apply"; exit 1; }
+# Decryption builds: TWRP 14.1's Android.mk and libtar/Android.mk still name the old
+# "-ndk_platform" security libraries, which Android 14 no longer generates (#21 failed:
+# "android.security.apc-ndk_platform ... missing and no known rule"). TeamWin's own
+# android-14.1 vold already uses the modern names - use the same ones here.
+for mk in bootable/recovery/Android.mk bootable/recovery/libtar/Android.mk; do
+    sed -i -e 's/android\.security\.apc-ndk_platform/android.security.apc-ndk/g' \
+           -e 's/android\.security\.authorization-ndk_platform/android.security.authorization-ndk/g' \
+           -e 's/android\.security\.maintenance-ndk_platform/android.security.maintenance-ndk/g' \
+           -e 's/android\.system\.keystore2-V1-ndk_platform/android.system.keystore2-V4-ndk/g' "$mk"
+done
+! grep -n "ndk_platform" bootable/recovery/Android.mk bootable/recovery/libtar/Android.mk \
+    || { echo "!! old -ndk_platform library names still present"; exit 1; }
 # lptools "map" (used by ASEM Stock Restore to get a WRITABLE mapping of a logical
 # partition) hard-codes LP metadata slot 0 = the _a layout. On this Virtual A/B phone
 # running slot b, slot 0 has no *_b partitions, so map failed. Use the current slot's
