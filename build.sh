@@ -150,6 +150,24 @@ for mk in bootable/recovery/Android.mk bootable/recovery/libtar/Android.mk; do
 done
 ! grep -n "ndk_platform" bootable/recovery/Android.mk bootable/recovery/libtar/Android.mk \
     || { echo "!! old -ndk_platform library names still present"; exit 1; }
+# Decryption builds: TWRP 14.1 libtar uses the "fscrypt_policy" union + helpers from
+# TWRP commit 97b849918 [1/2], but its vold half [2/2] exists only in TeamWin vold
+# android-12.1, not android-14.1 (#22 failed: "must use 'struct' tag to refer to type
+# 'fscrypt_policy_v1'"). Revert the libtar half so libtar uses plain struct
+# fscrypt_policy_v2 again, matching vold 14.1's fscrypt_policy.h.
+if ! grep -q 'struct fscrypt_policy_v2  \*fep;' bootable/recovery/libtar/libtar.h; then
+    (cd bootable/recovery && patch -R -p1 --no-backup-if-mismatch -s < "$HERE/tools/patches/twrp_97b849918_libtar.patch") \
+        || { echo "!! libtar fscrypt revert did not apply"; exit 1; }
+fi
+grep -q 'struct fscrypt_policy_v2  \*fep;' bootable/recovery/libtar/libtar.h \
+    && ! grep -q 'get_policy_descriptor' bootable/recovery/libtar/append.c \
+    || { echo "!! libtar still uses the fscrypt_policy union"; exit 1; }
+# vold 14.1 added a "zoned_device" parameter before fstab_path in
+# fscrypt_mount_metadata_encrypted(); TWRP 14.1 still passes 6 arguments, so its
+# additional-fstab path would land in zoned_device (wrong dm device, metadata decrypt
+# fails). Pass an empty zoned_device so the fstab path reaches fstab_path again.
+sed -i 's|Decrypt_Data->Current_File_System, TWFunc::Path_Exists(additional_fstab)|Decrypt_Data->Current_File_System, "", TWFunc::Path_Exists(additional_fstab)|'     bootable/recovery/partitionmanager.cpp
+grep -q 'Decrypt_Data->Current_File_System, "", TWFunc::Path_Exists(additional_fstab)' bootable/recovery/partitionmanager.cpp     || { echo "!! metadata decrypt zoned_device patch did not apply"; exit 1; }
 # lptools "map" (used by ASEM Stock Restore to get a WRITABLE mapping of a logical
 # partition) hard-codes LP metadata slot 0 = the _a layout. On this Virtual A/B phone
 # running slot b, slot 0 has no *_b partitions, so map failed. Use the current slot's
