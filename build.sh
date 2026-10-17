@@ -168,6 +168,21 @@ grep -q 'struct fscrypt_policy_v2  \*fep;' bootable/recovery/libtar/libtar.h \
 # fails). Pass an empty zoned_device so the fstab path reaches fstab_path again.
 sed -i 's|Decrypt_Data->Current_File_System, TWFunc::Path_Exists(additional_fstab)|Decrypt_Data->Current_File_System, "", TWFunc::Path_Exists(additional_fstab)|'     bootable/recovery/partitionmanager.cpp
 grep -q 'Decrypt_Data->Current_File_System, "", TWFunc::Path_Exists(additional_fstab)' bootable/recovery/partitionmanager.cpp     || { echo "!! metadata decrypt zoned_device patch did not apply"; exit 1; }
+# Open TWRP Gerrit fixes for FBE on 14.1 (see the patch / script headers):
+#  8744 - drop FDE calls to functions vold 14.1 no longer has (FBE path unchanged)
+#  7920 - vold talks to AIDL GateKeeper (this phone has no HIDL GateKeeper -> PIN/
+#         pattern/password unlock needs it)
+#  7957 + 8745 link part - makefiles (tools/patch_twrp_decrypt.py)
+grep -q 'Legacy FDE fallback removed' bootable/recovery/partitionmanager.cpp \
+    || (cd bootable/recovery && patch -p1 --no-backup-if-mismatch -s < "$HERE/tools/patches/gerrit_8744_remove_fde.patch") \
+    || { echo "!! Gerrit 8744 (remove FDE) did not apply"; exit 1; }
+grep -q 'AidlIGatekeeper' system/vold/Decrypt.cpp \
+    || (cd system/vold && patch -p1 --no-backup-if-mismatch -s < "$HERE/tools/patches/gerrit_7920_vold_aidl_gatekeeper.patch") \
+    || { echo "!! Gerrit 7920 (vold AIDL GateKeeper) did not apply"; exit 1; }
+python3 "$HERE/tools/patch_twrp_decrypt.py" "$PWD" || exit 1
+! grep -nE '\bcryptfs_(check_footer|get_password_type|check_passwd)\b|\bdelete_crypto_blk_dev\b|\bset_partition_data\b' \
+    bootable/recovery/partition.cpp bootable/recovery/partitionmanager.cpp \
+    || { echo "!! FDE calls still present"; exit 1; }
 # lptools "map" (used by ASEM Stock Restore to get a WRITABLE mapping of a logical
 # partition) hard-codes LP metadata slot 0 = the _a layout. On this Virtual A/B phone
 # running slot b, slot 0 has no *_b partitions, so map failed. Use the current slot's
