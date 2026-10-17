@@ -7,6 +7,10 @@
 #   -> tee-service + Gatekeeper ; KeyMint 3.0 (+ SharedSecret, SecureClock, RKP)
 # libasem_shim.so is preloaded: it supplies the 2 symbols (of ~41,000) that the
 # android-14.1 recovery libraries lack. Recovery runs SELinux permissive.
+# The AIDL HALs (tee-service, KeyMint, GateKeeper) must load the RECOVERY's system
+# libraries first: with the phone's /vendor/lib64 libbinder first they could not register
+# with the recovery's servicemanager (addService -> EX_TRANSACTION_FAILED -129, abort),
+# found on the phone 2026-10-17 (R3 run #25). mobicore has no binder, keeps vendor first.
 
 service asem_decrypt_setup /system/bin/sh /system/bin/asem_decrypt_setup.sh
     user root
@@ -58,7 +62,7 @@ service tee-service /vendor/bin/hw/vendor.trustonic.tee-service
     user root
     group root
     seclabel u:r:recovery:s0
-    setenv LD_LIBRARY_PATH /vendor/lib64:/system/lib64
+    setenv LD_LIBRARY_PATH /system/lib64:/vendor/lib64
     setenv LD_PRELOAD /system/lib64/libasem_shim.so
     disabled
 
@@ -66,7 +70,7 @@ service vendor.keymint-trustonic /vendor/bin/hw/android.hardware.security.keymin
     user root
     group root
     seclabel u:r:recovery:s0
-    setenv LD_LIBRARY_PATH /vendor/lib64:/system/lib64
+    setenv LD_LIBRARY_PATH /system/lib64:/vendor/lib64
     setenv LD_PRELOAD /system/lib64/libasem_shim.so
     disabled
 
@@ -74,7 +78,7 @@ service vendor.gatekeeper-default /vendor/bin/hw/android.hardware.gatekeeper-ser
     user root
     group root
     seclabel u:r:recovery:s0
-    setenv LD_LIBRARY_PATH /vendor/lib64:/system/lib64
+    setenv LD_LIBRARY_PATH /system/lib64:/vendor/lib64
     setenv LD_PRELOAD /system/lib64/libasem_shim.so
     disabled
 

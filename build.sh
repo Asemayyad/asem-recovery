@@ -130,6 +130,14 @@ sed -i 's/^LOCAL_REQUIRED_MODULES += init_second_stage\.recovery /LOCAL_REQUIRED
     bootable/recovery/prebuilt/Android.mk
 grep -q '^LOCAL_REQUIRED_MODULES += task_profiles.json init_second_stage.recovery' bootable/recovery/prebuilt/Android.mk \
     || { echo "!! task_profiles.json patch did not apply"; exit 1; }
+# ...and TWRP copies it only as task_profiles/task_profiles_30.json, but libprocessgroup
+# first reads /etc/task_profiles.json: without it logd aborts ("failed to set background
+# scheduling policy") and recovery has no logcat. Copy it under that name too.
+grep -q 'task_profiles.json $(TARGET_RECOVERY_ROOT_OUT)/system/etc/task_profiles.json' bootable/recovery/prebuilt/Android.mk \
+    || sed -i 's|^\(    cp $(TARGET_OUT_ETC)/task_profiles.json $(TARGET_RECOVERY_ROOT_OUT)/system/etc/task_profiles/task_profiles_30.json\)$|\1 \&\& \\\n    cp $(TARGET_OUT_ETC)/task_profiles.json $(TARGET_RECOVERY_ROOT_OUT)/system/etc/task_profiles.json|' \
+        bootable/recovery/prebuilt/Android.mk
+grep -q 'task_profiles.json $(TARGET_RECOVERY_ROOT_OUT)/system/etc/task_profiles.json' bootable/recovery/prebuilt/Android.mk \
+    || { echo "!! task_profiles.json (logd) patch did not apply"; exit 1; }
 # SELinux permissive in recovery. R1 ran Enforcing (TWRP's policy) and crash-looped on
 # denials (black screen). Usual fix is androidboot.selinux=permissive on the cmdline, but
 # here cmdline/bootconfig are shared with normal boot, so patch TWRP's init instead: that

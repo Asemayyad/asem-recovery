@@ -62,6 +62,49 @@ def main(root):
     edit(p, [(indent + so, indent + so.replace("android.hardware.gatekeeper@1.0.so",
                                                 "android.hardware.gatekeeper-V1-ndk.so") + indent + so)])
 
+    # vold (after Gerrit 7920): the AIDL verify() result was never checked. When the HAL
+    # call failed, rsp kept its defaults (statusCode 0 = STATUS_OK, empty token), TWRP
+    # printed "GateKeeper status ok", skipped addAuthToken and failed later with the
+    # misleading "Begin Operation failed". Stop there and print the real error.
+    # vold Keystore(): AServiceManager_waitForService(keystore2) waits FOREVER. When the
+    # TEE services cannot start, keystore2 crash-loops and TWRP freezes on the splash
+    # screen (seen 2026-10-17, R3 run #25). Wait at most 60 s, then fail cleanly: every
+    # caller already handles "no keystore" (if (!keystore) return false).
+    p = os.path.join(root, "system", "vold", "Keystore.cpp")
+    s = open(p).read()
+    if "ASEM: bounded keystore2 wait" in s:
+        print("already patched:", p)
+    else:
+        old = "    ::ndk::SpAIBinder binder(AServiceManager_waitForService(keystore2_service_name));\n"
+        new = ("    // ASEM: bounded keystore2 wait (60 s) instead of waiting forever\n"
+               "    ::ndk::SpAIBinder binder;\n"
+               "    for (int i = 0; i < 120 && binder.get() == nullptr; i++) {\n"
+               "        binder = ::ndk::SpAIBinder(AServiceManager_checkService(keystore2_service_name));\n"
+               "        if (binder.get() == nullptr) usleep(500 * 1000);\n"
+               "    }\n")
+        inc_old = "#include \"Keystore.h\"\n"
+        if s.count(old) != 1 or s.count(inc_old) != 1:
+            sys.exit("!! %s: keystore2 wait / include not found once" % p)
+        s = s.replace(old, new).replace(inc_old, inc_old + "\n#include <unistd.h>\n")
+        open(p, "w").write(s)
+        print("patched:", p)
+
+    p = os.path.join(root, "system", "vold", "Decrypt.cpp")
+    s = open(p).read()
+    mark = "GateKeeper verify call failed"
+    if mark in s:
+        print("already patched:", p)
+        return
+    old = ("\t\t\t\tauto result = aidl_gk_device->verify(fakeUid(user_id), 0 /* challenge */, "
+           "pwd_handle_hidl, gk_pwd_token_hidl, &rsp);\n\t\t\t\tfree(gk_pwd_token);\n")
+    if s.count(old) != 1:
+        sys.exit("!! %s: AIDL verify call not found once (Gerrit 7920 not applied?)" % p)
+    s = s.replace(old, old + "\t\t\t\tif (!result.isOk()) {\n"
+                  "\t\t\t\t\tprintf(\"" + mark + ": %s\\n\", result.getDescription().c_str());\n"
+                  "\t\t\t\t\treturn Free_Return(retval, weaver_key, &pwd);\n\t\t\t\t}\n")
+    open(p, "w").write(s)
+    print("patched:", p)
+
 
 if __name__ == "__main__":
     main(sys.argv[1])
