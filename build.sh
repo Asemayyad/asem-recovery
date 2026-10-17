@@ -220,7 +220,35 @@ mkdir -p "$HERE/out"
 # keep the raw TWRP build too, so a packing problem never loses a finished build
 cp out/target/product/X6855/vendor_boot.img "$HERE/out/twrp_built_vendor_boot.img"
 IMG="$HERE/out/ASEM_Recovery_X6855_${VERSION}$([ "$ASEM_DECRYPT" = true ] && echo _decrypt).img"
-python3 "$HERE/tools/asem_vendor_boot.py" replace "$STOCK" out/target/product/X6855/vendor_boot.img "$IMG"
+# Library check: TWRP copies libraries into the ramdisk from a fixed list and silently
+# skips names that were not built; decrypt builds link newer AIDL versions (keystore2-V4,
+# keymint-V3) than that list names -> TWRP could not start. Copy in whatever is missing
+# and repack the fragment with the same command the build uses
+# (core/Makefile build-vendor-ramdisk-fragment-target: mkbootfs -d system <root> | lz4).
+P=out/target/product/X6855
+HB=out/host/linux-x86/bin
+FRAG="$P/asem_frag_twrp.bin"
+python3 "$HERE/tools/asem_vendor_boot.py" extract "$P/vendor_boot.img" recovery "$FRAG"
+if [ -x "$HB/mkbootfs" ] && [ -x "$HB/lz4" ]; then REPACK=true; else REPACK=false
+    echo "   WARNING: $HB/mkbootfs or lz4 missing - no library fix / repack, using the build's fragment"; fi
+if $REPACK; then
+    "$HB/mkbootfs" -d "$P/system" "$P/recovery/root" | "$HB/lz4" -l -12 --favor-decSpeed > "$P/asem_frag_test.lz4" || true
+    if cmp -s "$FRAG" "$P/asem_frag_test.lz4"; then echo "   repack self-test: byte-identical to the build's fragment"
+    else echo "   WARNING: repack self-test differs from the build's fragment ($(stat -c %s "$FRAG") vs $(stat -c %s "$P/asem_frag_test.lz4") bytes)"; fi
+    python3 "$HERE/tools/check_ramdisk_libs.py" "$P/recovery/root" --fix "$P/system/lib64" "$P/system_ext/lib64" \
+        "$P/product/lib64" "$P/vendor/lib64" | tee "$HERE/out/ramdisk_libs.txt" || true
+fi
+if $REPACK && grep -q '^added ' "$HERE/out/ramdisk_libs.txt"; then
+    "$HB/mkbootfs" -d "$P/system" "$P/recovery/root" | "$HB/lz4" -l -12 --favor-decSpeed > "$P/asem_frag_fixed.lz4"
+    FRAG="$P/asem_frag_fixed.lz4"
+fi
+# vendor_boot is 64 MB. If LZ4 does not fit, use gzip -9 (kernel: CONFIG_RD_GZIP=y,
+# 3_live_info/kernel_config.txt); each ramdisk fragment is decompressed on its own.
+if ! python3 "$HERE/tools/asem_vendor_boot.py" replace "$STOCK" "$FRAG" "$IMG"; then
+    echo "== recovery fragment too big with LZ4 - repacking with gzip -9"
+    "$HB/mkbootfs" -d "$P/system" "$P/recovery/root" | gzip -9n > "$P/asem_frag.gz"
+    python3 "$HERE/tools/asem_vendor_boot.py" replace "$STOCK" "$P/asem_frag.gz" "$IMG"
+fi
 python3 "$HERE/tools/asem_vendor_boot.py" info "$IMG"
 (cd "$HERE/out" && sha256sum "$(basename "$IMG")" > "$(basename "$IMG").sha256")
 echo "== done: $IMG"
