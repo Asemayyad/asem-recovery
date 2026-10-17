@@ -1,5 +1,7 @@
 # ASEM Recovery - Infinix NOTE 50 Pro 4G (X6855)
 
+![ASEM Recovery](design/asem_recovery_banner.png)
+
 <div dir="rtl" align="right">
 
 ## ريكفري ASEM — دعم عربي أصيل
