@@ -44,6 +44,15 @@ on boot
     write /sys/devices/system/cpu/cpufreq/policy0/scaling_governor performance
     write /sys/devices/system/cpu/cpufreq/policy6/scaling_governor performance
 
+# ASEM: vibration. The phone's vibrator is LED-class (/sys/class/leds/vibrator,
+# regulator_vibrator) with only brightness/trigger. TWRP's default haptics write
+# vibrator/duration + vibrator/activate, which exist only with the "transient" trigger
+# (built into this kernel). state=1 = motor ON while active (default 0 = off).
+# Tested on the phone 2026-10-17.
+on boot
+    write /sys/class/leds/vibrator/trigger transient
+    write /sys/class/leds/vibrator/state 1
+
 # ASEM: Android service manager + A/B boot control (proven live 2026-10-16).
 #  - The recovery's servicemanager is linked against /system/bin/bootstrap/linker64,
 #    which the recovery lacks: it never started, so NO AIDL service (fastboot, boot
