@@ -1,3 +1,8 @@
+<p align="center">
+<b>بسم الله الرحمن الرحيم</b><br>
+<i>In the name of Allah, the Most Gracious, the Most Merciful</i>
+</p>
+
 # ASEM Recovery - Infinix NOTE 50 Pro 4G (X6855)
 
 ![ASEM Recovery](design/asem_recovery_banner.png)
