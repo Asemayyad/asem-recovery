@@ -208,6 +208,33 @@ if mark not in s:
 PYEOF
 grep -q '// ASEM: current slot metadata' external/lptools/lptools.cc \
     || { echo "!! lptools map patch did not apply"; exit 1; }
+# Format Data on this Virtual A/B phone runs Check_Pending_Merges() first, which failed:
+#  - decryption's TEE services run from /vendor and keep it busy -> "Unable to unmap dynamic
+#    partitions"
+#  - TWRP only unmaps the partitions in its fstab; the X6855 tr_* ones stay mapped, so
+#    libsnapshot HandleImminentDataWipe() cannot map super fresh -> "Unable to check merge status"
+# asem_preformat.sh (device tree, /system/bin) fixes both: "pre" before TWRP's unmap,
+# "unmap" right before the merge check. Only stops services / unmounts / unmaps.
+python3 - bootable/recovery/partitionmanager.cpp <<'PYEOF'
+import sys
+p = sys.argv[1]; s = open(p).read()
+mark = "// ASEM: asem_preformat"
+if mark not in s:
+    i = s.index("bool TWPartitionManager::Check_Pending_Merges()")
+    def run(arg):
+        return ('\t{ ' + mark + ' ' + arg + '\n'
+                '\t\tstd::string asem_out;\n'
+                '\t\tTWFunc::Exec_Cmd("/system/bin/sh /system/bin/asem_preformat.sh ' + arg + '", asem_out, true);\n'
+                '\t\tLOGINFO("%s", asem_out.c_str());\n'
+                '\t}\n')
+    a = s.index("\tauto sm = android::snapshot::SnapshotManager::NewForFirstStageMount();", i)
+    s = s[:a] + run("pre") + s[a:]
+    b = s.index('\tLOGINFO("checking for merges\\n");', i)
+    s = s[:b] + run("unmap") + s[b:]
+    open(p, "w").write(s)
+PYEOF
+[ "$(grep -c '// ASEM: asem_preformat' bootable/recovery/partitionmanager.cpp)" = 2 ] \
+    || { echo "!! Format Data (asem_preformat) patch did not apply"; exit 1; }
 
 echo "== copying device tree"
 rm -rf device/infinix/X6855
