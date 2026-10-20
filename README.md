@@ -204,7 +204,10 @@ in the device tree / a per-device config. X6855 is the first device.
 
 - Telegram: [@Asemfuad](https://t.me/Asemfuad)
 - Instagram: [@asem.dev](https://instagram.com/asem.dev)
+- To support me: [paypal@AsemAyyad](https://www.paypal.com/paypalme/Mus7af)
 
+
+- To join our channel in Telegram [infinix_Note50Pro](https://t.me/infinix_note50pro)
 <div dir="rtl" align="right">
 
 ## الشكر والتقدير
@@ -218,5 +221,8 @@ in the device tree / a per-device config. X6855 is the first device.
 للتواصل:
 - تيليجرام: [@Asemfuad](https://t.me/Asemfuad)
 - إنستغرام: [@asem.dev](https://instagram.com/asem.dev)
+- للدعم المادي: [paypal@AsemAyyad](https://www.paypal.com/paypalme/Mus7af)
 
+
+- صفحتنا على تيلغرام [infinix_Note50Pro](https://t.me/infinix_note50pro)
 </div>
