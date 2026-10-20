@@ -191,6 +191,10 @@ in the device tree / a per-device config. X6855 is the first device.
 
 ---
 
+##Downolad
+
+To download [go here](https://github.com/Asemayyad/asem-recovery/releases)
+
 ## Credits
 
 - **[TeamWin - TWRP](https://twrp.me)** - ASEM Recovery is built on TWRP (android-14.1,
@@ -209,6 +213,11 @@ in the device tree / a per-device config. X6855 is the first device.
 
 - To join our channel in Telegram [infinix_Note50Pro](https://t.me/infinix_note50pro)
 <div dir="rtl" align="right">
+
+##التحميل
+
+لتحميل الريكوفري [اضغط هنا](https://github.com/Asemayyad/asem-recovery/releases)
+
 
 ## الشكر والتقدير
 
