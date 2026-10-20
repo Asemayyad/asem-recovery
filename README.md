@@ -191,7 +191,7 @@ in the device tree / a per-device config. X6855 is the first device.
 
 ---
 
-##Downolad
+## Downolad
 
 To download [go here](https://github.com/Asemayyad/asem-recovery/releases)
 
@@ -214,7 +214,7 @@ To download [go here](https://github.com/Asemayyad/asem-recovery/releases)
 - To join our channel in Telegram [infinix_Note50Pro](https://t.me/infinix_note50pro)
 <div dir="rtl" align="right">
 
-##التحميل
+## التحميل
 
 لتحميل الريكوفري [اضغط هنا](https://github.com/Asemayyad/asem-recovery/releases)
 
