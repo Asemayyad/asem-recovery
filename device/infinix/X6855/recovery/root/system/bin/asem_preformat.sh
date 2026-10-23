@@ -38,6 +38,9 @@ release() {
 #  2. the decryption device-mapper node "userdata" (dm-default-key) still sits on the partition:
 #     mke2fs / make_f2fs refuse it ("apparently in use by the system") -> delete the node
 #     (lptools unmap = delete the dm device by name only, the partition table is not touched)
+#  3. TWRP still formats the decrypted device path /dev/block/mapper/userdata; without the node it
+#     stops "Block device not present, cannot format Data" -> put a link there to the partition
+#     itself, so mke2fs / make_f2fs format the plain partition (tested by hand 2026-10-24: OK)
 release_data() {
     dev=$(grep " /data " /proc/mounts | head -1 | cut -d' ' -f1)
     if [ -n "$dev" ]; then
@@ -48,6 +51,11 @@ release_data() {
     if [ -e /dev/block/mapper/userdata ] && ! grep -q " /data " /proc/mounts; then
         lptools unmap userdata >/dev/null 2>&1 && say "removed the decryption mapping (userdata)" \
             || say "could not remove the decryption mapping (userdata)"
+    fi
+    raw=$(readlink -f /dev/block/by-name/userdata)
+    if [ ! -e /dev/block/mapper/userdata ] && [ -b "$raw" ]; then
+        ln -s "$raw" /dev/block/mapper/userdata && say "userdata -> $raw (format the partition itself)" \
+            || say "could not link userdata to $raw"
     fi
 }
 
