@@ -9,7 +9,8 @@
 #                               twinstall.cpp by build.sh): stop the TEE services, unmount every
 #                               mount of a dynamic partition. /data stays mounted and unlocked.
 #   asem_preformat.sh pre       Format Data (Check_Pending_Merges, hooked by build.sh): the same,
-#                               plus mount /metadata (the snapshot code reads /metadata/ota)
+#                               plus unmount /data (+ /data/user/0 ...), delete the decryption
+#                               mapping, and mount /metadata (the snapshot code reads /metadata/ota)
 #   asem_preformat.sh unmap     Format Data, after TWRP unmapped the partitions in its fstab:
 #                               unmap the rest (the 8 tr_* ...) so libsnapshot's
 #                               HandleImminentDataWipe() can map all of super fresh
@@ -31,12 +32,32 @@ release() {
     done
 }
 
+# Format Data after decryption (found on R5, 2026-10-23):
+#  1. the data device is also mounted at /data/user/0 (maybe /sdcard ...): umount /data fails
+#     "Device or resource busy" -> unmount those extra mounts (deepest first), then /data
+#  2. the decryption device-mapper node "userdata" (dm-default-key) still sits on the partition:
+#     mke2fs / make_f2fs refuse it ("apparently in use by the system") -> delete the node
+#     (lptools unmap = delete the dm device by name only, the partition table is not touched)
+release_data() {
+    dev=$(grep " /data " /proc/mounts | head -1 | cut -d' ' -f1)
+    if [ -n "$dev" ]; then
+        for m in $(grep "^$dev " /proc/mounts | cut -d' ' -f2 | sort -r); do
+            umount "$m" 2>/dev/null && say "unmounted $m" || say "could not unmount $m"
+        done
+    fi
+    if [ -e /dev/block/mapper/userdata ] && ! grep -q " /data " /proc/mounts; then
+        lptools unmap userdata >/dev/null 2>&1 && say "removed the decryption mapping (userdata)" \
+            || say "could not remove the decryption mapping (userdata)"
+    fi
+}
+
 case "$1" in
 install)
     release
     ;;
 pre)
     release
+    release_data
     if ! grep -q " /metadata " /proc/mounts; then
         mkdir -p /metadata
         mount -t ext4 -o rw,noatime,nosuid,nodev,discard /dev/block/by-name/metadata /metadata \
