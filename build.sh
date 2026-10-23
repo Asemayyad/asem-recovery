@@ -235,6 +235,33 @@ if mark not in s:
 PYEOF
 [ "$(grep -c '// ASEM: asem_preformat' bootable/recovery/partitionmanager.cpp)" = 2 ] \
     || { echo "!! Format Data (asem_preformat) patch did not apply"; exit 1; }
+# Zip installs (Install + ADB Sideload): the same busy-/vendor problem made every zip that remaps
+# logical partitions fail ("could not map vendor_b writable") - ours and other people's ROMs.
+# Release the dynamic partitions right before TWRP runs a zip's update-binary.
+python3 - bootable/recovery/twrpinstall/twinstall.cpp <<'PYEOF'
+import sys
+p = sys.argv[1]; s = open(p).read()
+mark = "// ASEM: asem_preformat install"
+if mark not in s:
+    old = "\t\t\tif (ret_val == INSTALL_SUCCESS)\n\t\t\t\tret_val = Run_Update_Binary(path, wipe_cache, UPDATE_BINARY_ZIP_TYPE);"
+    assert s.count(old) == 1, "twinstall anchor not found exactly once"
+    new = ("\t\t\tif (ret_val == INSTALL_SUCCESS) { " + mark + "\n"
+           "\t\t\t\tstd::string asem_out;\n"
+           "\t\t\t\tTWFunc::Exec_Cmd(\"/system/bin/sh /system/bin/asem_preformat.sh install\", asem_out, true);\n"
+           "\t\t\t\tLOGINFO(\"%s\", asem_out.c_str());\n"
+           "\t\t\t}\n" + old)
+    s = s.replace(old, new)
+    open(p, "w").write(s)
+PYEOF
+grep -q '// ASEM: asem_preformat install' bootable/recovery/twrpinstall/twinstall.cpp \
+    || { echo "!! zip install (asem_preformat install) patch did not apply"; exit 1; }
+# ADB Sideload refused files over 16 GB ("file has too many blocks": 1<<18 blocks of 64 KiB).
+# Allow 128 GB (1<<21 blocks; the per-block hash table is then at most 64 MB of RAM) - full ROM
+# zips and the stock restore (12.4 GB) fit with room to spare.
+sed -i 's/if (fd.file_blocks > (1 << 18)) {/if (fd.file_blocks > (1 << 21)) {  \/\/ ASEM: 128 GB sideload/' \
+    bootable/recovery/fuse_sideload/fuse_sideload.cpp
+grep -q 'ASEM: 128 GB sideload' bootable/recovery/fuse_sideload/fuse_sideload.cpp \
+    || { echo "!! sideload size patch did not apply"; exit 1; }
 
 echo "== copying device tree"
 rm -rf device/infinix/X6855
